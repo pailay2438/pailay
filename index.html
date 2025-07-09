@@ -1,0 +1,1192 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width">
+
+    <title>Pailay | บ้านพักภูวิลล่า</title>
+    <link rel="icon" type="image/png" href="https://lh3.googleusercontent.com/d/1WjkDUC35PL6kGfALWyzK7uXdvrSeWfLf">
+    <link href="style.css" rel="stylesheet" type="text/css" />
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz"
+        crossorigin="anonymous"></script>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css">
+
+    <script src="//cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pako/2.0.4/pako.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+</head>
+
+<body>
+    <header>
+        <div class="container d-flex align-items-center justify-content-center" style="height: 100vh;">
+            <div class="progress"></div>
+        </div>
+    </header>
+
+    <main class="login" id="login">
+        <div class=" d-flex justify-content-center align-items-center vh-100 bgss">
+            <div class="overlay"></div>
+            <div class="card shadow-sm p-3"
+                style="max-width: 400px; width: 100%; background-color: rgba(255, 255, 255, 0.2); z-index: 3;">
+                <div class="text-center mb-1">
+                    <img src="https://lh3.googleusercontent.com/d/1WjkDUC35PL6kGfALWyzK7uXdvrSeWfLf" alt="Logo"
+                        class="img-fluid mb-0 w-75">
+                </div>
+                <form class="row login-form" id="login-form">
+                    <p class="fw-bold fs-3 text-customs text-center mb-1">เข้าสู่ระบบ</p>
+                    <div class="col-12">
+                        <div class="input-group mb-1">
+                            <span class="input-group-text"><i class="bi bi-person-fill"></i></span>
+                            <input type="text" class="form-control" id="username" placeholder="ชื่อผู้ใช้"
+                                aria-label="Username" aria-describedby="Username" autocomplete="username">
+                        </div>
+                        <div class="input-group mb-1">
+                            <span class="input-group-text"><i class="bi bi-key-fill"></i></span>
+                            <input type="password" class="form-control" id="password" placeholder="รหัสผ่าน"
+                                aria-label="Password" aria-describedby="Password" autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="btn btn-warning w-100 logins mb-1">เข้าสู่ระบบ</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </main>
+
+    <nav class="navbar navbar-expand-lg navbar-light bg-light theme-dependent shadow-sm fixed-top">
+        <div class="container-fluid">
+            <a class="navbar-brand text-custom" href="#">
+                <img src="https://lh3.googleusercontent.com/d/1WjkDUC35PL6kGfALWyzK7uXdvrSeWfLf" alt="Logo">
+                Pailay พลูวิลล่า
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav">
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".listpoolvilla" aria-current="page">
+                            ลงทะเบียนบ้านพักในเครือ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".revenuelist" aria-current="page">
+                            รายการค้างชำระในเครือ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".houseoutside" aria-current="page">
+                            ลงทะเบียนบ้านพักนอกเครือ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".houseoutsidelist" aria-current="page">
+                            รายการค้างชำระนอกเครือ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".checkin" aria-current="page">
+                            Check In
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".checkout" aria-current="page">
+                            Check Out
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".quotation" aria-current="page">
+                            ออกใบเสนอราคา
+                        </a>
+                    </li>
+
+                </ul>
+                <div class="d-flex flex-column flex-lg-row align-items-center gap-4">
+                    <i class="bi bi-sun dark-mode-icon" id="darkModeIcon" title="Toggle Dark Mode"></i>
+                    <div class="user-info text-center">
+                        <img src="" alt="User" id="profile">
+                        <div class="details">
+                            <strong id="profilename">John Doe</strong><br>
+                            <small id="profileposition" class="text-muted">Manager</small>
+                        </div>
+                    </div>
+                    <button class="btn btn-logout btn-sm logout">Logout</button>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+
+    <main class="houseoutside quotation mt-5" id="houseoutside">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3 formtype">ลงทะเบียนบ้านพักนอกเครือ</legend>
+                    <span class="formtype d-none" id="formtype"></span>
+                    <div class="row">
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">ชื่อบ้านพัก</legend>
+                            <div class="formtypes">
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">ข้อมูลผู้เข้าพัก</legend>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ชื่อผู้จอง"
+                                        aria-label="ชื่อผู้จอง" id="booking_name" autocomplete="booking_name">
+                                    <label for="booking_name">ชื่อผู้จอง</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="เบอร์ติดต่อ"
+                                        aria-label="เบอร์ติดต่อ" inputmode="tel" id="booking_tel" maxlength="10"
+                                        autocomplete="booking_tel">
+                                    <label for="booking_tel">เบอร์ติดต่อ</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="Facebook" aria-label="Facebook"
+                                        id="booking_facebook">
+                                    <label for="booking_facebook">Facebook</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="Line" aria-label="Line"
+                                        id="booking_line">
+                                    <label for="booking_line">Line</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ช่องทางการจอง"
+                                        aria-label="ช่องทางการจอง" id="booking_channel">
+                                    <label for="booking_channel">ช่องทางการจอง</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="หมายเหตุเพิ่มเติม"
+                                        aria-label="หมายเหตุเพิ่มเติม" id="booking_note">
+                                    <label for="booking_note">หมายเหตุเพิ่มเติม</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">วันที่เข้าพัก</legend>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="วันที่เข้าพัก"
+                                        aria-label="วันที่เข้าพัก" id="booking_timestart">
+                                    <label for="booking_timestart">ตั้งแต่วันที่</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-2 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="time" placeholder="เวลา" aria-label="เวลา"
+                                        id="booking_starttime">
+                                    <label for="booking_starttime">เวลา</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ถึงวันที่"
+                                        aria-label="ถึงวันที่" id="booking_timeend">
+                                    <label for="booking_timeend">ถึงวันที่</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-2 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="time" placeholder="เวลา" aria-label="เวลา"
+                                        id="booking_endtime">
+                                    <label for="booking_endtime">เวลา</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-2 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="จำนวนวันเข้าพัก"
+                                        aria-label="จำนวนวันเข้าพัก" id="booking_timevalue" disabled>
+                                    <label for="booking_timevalue">จำนวนวันเข้าพัก</label>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                            <legend class="float-none w-auto px-3">ราคาต่อคืน</legend>
+                            <div class="nightse row"></div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">รายละเอียดการเข้าพัก</legend>
+                            <div class="col-12 col-md-4 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="จำนวนผู้เข้าพัก" aria-label="จำนวนผู้เข้าพัก" id="booking_quser">
+                                    <label for="booking_quser">ผู้เข้าพัก(จำนวน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric" placeholder="จำนวนห้อง"
+                                        aria-label="จำนวนห้อง" id="booking_qroom">
+                                    <label for="booking_qroom">ห้อง(จำนวน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="จำนวนที่นอนเสริม" aria-label="จำนวนที่นอนเสริม" id="booking_qbed">
+                                    <label for="booking_qbed">ที่นอนเสริม(จำนวน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="จำนวนอาหารเช้า"
+                                        aria-label="จำนวนอาหารเช้า" id="booking_tfood">
+                                    <label for="booking_tfood">อาหารเช้า(เมนู)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="อาหารเช้าจำนวนเซ็ท" aria-label="อาหารเช้าจำนวนเซ็ท"
+                                        id="booking_qfood">
+                                    <label for="booking_qfood">อาหารเช้า(จำนวนเซ็ท)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ชนิดสัตว์เลี้ยง"
+                                        aria-label="ชนิดสัตว์เลี้ยง" id="booking_tanimal">
+                                    <label for="booking_tanimal">สัตว์เลี้ยง(ชนิด)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="จำนวนสัตว์เลี้ยง" aria-label="จำนวนสัตว์เลี้ยง"
+                                        id="booking_qanimal">
+                                    <label for="booking_qanimal">สัตว์เลี้ยง(จำนวน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="กรณีเข้าพักเกิน" aria-label="กรณีเข้าพักเกิน" id="booking_pdfedti1"
+                                        value="16">
+                                    <label for="booking_pdfedti1">กรณีเข้าพักเกิน(ท่าน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="เสริมที่นอนปิกนิก" aria-label="เสริมที่นอนปิกนิก"
+                                        id="booking_pdfedti2" value="700">
+                                    <label for="booking_pdfedti2">เสริมที่นอนปิกนิก(ท่านละ)</label>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">รายละเอียดราคา</legend>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาที่พัก"
+                                        aria-label="ราคาที่พัก" id="booking_totalroom" disabled>
+                                    <label for="booking_totalroom">ที่พัก(ราคา)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาอาหารเช้า"
+                                        aria-label="ราคาอาหารเช้า" inputmode="numeric" id="booking_totalfood">
+                                    <label for="booking_totalfood">อาหารเช้า(ราคาเซ็ทละ)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาที่นอนเสริม"
+                                        aria-label="ราคาที่นอนเสริม" inputmode="numeric" id="booking_totalbed">
+                                    <label for="booking_totalbed">ที่นอนเสริม(ราคาต่อชุด)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาสัตว์เลี้ยง"
+                                        aria-label="ราคาสัตว์เลี้ยง" inputmode="numeric" id="booking_totalanimal">
+                                    <label for="booking_totalanimal">สัตว์เลี้ยง(ราคาต่อตัว)</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                            <legend class="float-none w-auto px-3">ของแถม</legend>
+                            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 g-3">
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="booking_free_1" autocomplete="off"
+                                        value="น้ำแข็ง">
+                                    <label class="btn btn-outline-primary w-100" for="booking_free_1">น้ำแข็ง</label>
+                                    <div class="form-floating d-none mt-2" id="booking_input_col_1">
+                                        <input class="form-control" type="text" placeholder="จำนวนน้ำแข็ง"
+                                            aria-label="จำนวนน้ำแข็ง" inputmode="numeric" id="booking_free_price_1">
+                                        <label for="booking_free_price_1">จำนวน(กระสอบ)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="booking_free_2" autocomplete="off"
+                                        value="น้ำดื่ม">
+                                    <label class="btn btn-outline-primary w-100" for="booking_free_2">น้ำดื่ม</label>
+                                    <div class="form-floating d-none mt-2" id="booking_input_col_2">
+                                        <input class="form-control" type="text" placeholder="จำนวนน้ำดื่ม"
+                                            aria-label="จำนวนน้ำดื่ม" inputmode="numeric" id="booking_free_price_2">
+                                        <label for="booking_free_price_2">จำนวน(แพ็ค)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="booking_free_3" autocomplete="off"
+                                        value="ถ่านปิ่งย่าง">
+                                    <label class="btn btn-outline-primary w-100"
+                                        for="booking_free_3">ถ่านปิ่งย่าง</label>
+                                    <div class="form-floating d-none mt-2" id="booking_input_col_3">
+                                        <input class="form-control" type="text" placeholder="จำนวนถ่านปิ่งย่าง"
+                                            aria-label="จำนวนถ่านปิ่งย่าง" inputmode="numeric"
+                                            id="booking_free_price_3">
+                                        <label for="booking_free_price_3">จำนวน(ถุง)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="booking_free_4" autocomplete="off"
+                                        value="อาหารเช้า">
+                                    <label class="btn btn-outline-primary w-100" for="booking_free_4">อาหารเช้า</label>
+                                    <div class="form-floating d-none mt-2" id="booking_input_col_4">
+                                        <input class="form-control" type="text" placeholder="จำนวนอาหารเช้า"
+                                            aria-label="จำนวนอาหารเช้า" inputmode="numeric" id="booking_free_price_4">
+                                        <label for="booking_free_price_4">จำนวน(เซ็ท)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="booking_free_5" autocomplete="off"
+                                        value="ที่นอนเสริม">
+                                    <label class="btn btn-outline-primary w-100"
+                                        for="booking_free_5">ที่นอนเสริม</label>
+                                    <div class="form-floating d-none mt-2" id="booking_input_col_5">
+                                        <input class="form-control" type="text" placeholder="จำนวนที่นอนเสริม"
+                                            aria-label="จำนวนที่นอนเสริม" inputmode="numeric" id="booking_free_price_5">
+                                        <label for="booking_free_price_5">จำนวน(ที่)</label>
+                                    </div>
+                                </div>
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="booking_free_6" autocomplete="off"
+                                        value="สัตว์เลี้ยง">
+                                    <label class="btn btn-outline-primary w-100"
+                                        for="booking_free_6">สัตว์เลี้ยง</label>
+                                    <div class="form-floating d-none mt-2" id="booking_input_col_6">
+                                        <input class="form-control" type="text" placeholder="จำนวนสัตว์เลี้ยง"
+                                            aria-label="จำนวนสัตว์เลี้ยง" inputmode="numeric" id="booking_free_price_6">
+                                        <label for="booking_free_price_6">จำนวน(ตัว)</label>
+                                    </div>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">ค่าประกันบ้านพัก</legend>
+                            <div class="col-12 col-md-12 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาค่าประกันบ้านพัก"
+                                        aria-label="ราคาค่าประกันบ้านพัก" inputmode="numeric" id="booking_totalhouse">
+                                    <label for="booking_totalhouse">ค่าประกันบ้านพัก(ยอด)</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row paytotale">
+                            <legend class="float-none w-auto px-3">ยอดมัดจำ</legend>
+                            <div class="col-12 col-md-12 mb-1 paytotals">
+
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">สรุปค่าที่พัก</legend>
+                            <div class="col-12 col-md-12 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="รวมราคาทั้งสิ้น"
+                                        aria-label="รวมราคาทั้งสิ้น" id="booking_totalall" disabled>
+                                    <label for="booking_totalall">รวมราคาทั้งสิ้น</label>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ค้างชำระอีก"
+                                        aria-label="ค้างชำระอีก" id="booking_overdue" disabled>
+                                    <label for="booking_overdue">ค้างชำระอีก</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="หมายเหตุ" aria-label="หมายเหตุ"
+                                        id="booking_note_summary">
+                                    <label for="booking_note_summary">หมายเหตุ(หากมี)</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row payment">
+                            <legend class="float-none w-auto px-3">ช่องทางการชำระเงิน</legend>
+                            <div class="col-6 mb-1">
+                                <input type="radio" class="btn-check" name="paytype" id="booking_pay_1"
+                                    autocomplete="off" placeholder="ช่องทางชำระเงิน" value="เงินสด">
+                                <label class="btn btn-outline-primary w-100" for="booking_pay_1">เงินสด</label>
+                            </div>
+                            <div class="col-6 mb-1">
+                                <input type="radio" class="btn-check" name="paytype" id="booking_pay_2"
+                                    autocomplete="off" placeholder="ช่องทางชำระเงิน" value="โอนจ่าย">
+                                <label class="btn btn-outline-primary w-100" for="booking_pay_2">โอนจ่าย</label>
+                            </div>
+                            <div class="booking_typepay"></div>
+                        </fieldset>
+                        <div class="col-12 mb-1">
+                            <button class="btn btn-primary w-100 savehouseoutside">บันทึกการจอง</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="houseoutsidelist mt-5">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3">รายการค้างชำระนอกเครือ</legend>
+                    <div class="row">
+                        <div class="col-12 mb-1">
+                            <div class="form-floating position-relative">
+                                <input class="form-control pe-5" type="text" placeholder="ค้นหาข้อมูล"
+                                    aria-label="ค้นหาข้อมูล" id="searchusers">
+                                <label for="searchusers">ค้นหาข้อมูล</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div id="controls-container"
+                                class="d-flex justify-content-between align-items-center flex-wrap mb-1 rounded shadow-sm theme-dependent">
+                                <div id="dropdown-container" class="d-flex align-items-center">
+                                    <label for="houseoutsidelistSelect" class="form-label me-2">แสดงรายการ:</label>
+                                    <select id="houseoutsidelistSelect" class="form-select" style="width: auto;">
+                                    </select>
+                                </div>
+
+                                <nav id="shoplist-container" aria-label="Pagination">
+                                    <ul id="houseoutsidelistpage" class="pagination mb-0"></ul>
+                                </nav>
+                            </div>
+                            <div id="houseoutsidetables" class="row">
+
+                            </div>
+
+                        </div>
+
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="houseoutsidedeposit mt-5" id="houseoutsidedeposit">
+        <div class="container">
+            <div class="row">
+                <button class="btn btn-outline-danger w-100 navigate-button backhome"
+                    data-target=".houseoutsidelist">กลับหน้าหลัก</button>
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                    <legend class="float-none w-auto px-3">ชำระยอดคงเหลือ</legend>
+                    <span class="idlist d-none" id="idlist"></span>
+                    <div class="col-12 col-md-12 mb-1">
+                        <div class="form-floating">
+                            <input class="form-control" type="text" placeholder="ยอดค้างชำระ(จำนวน)"
+                                aria-label="ยอดค้างชำระ(จำนวน)" id="houseoutsidedepositadd" disabled>
+                            <label for="houseoutsidedepositadd"> ยอดค้างชำระ(จำนวน)</label>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-1">
+                        <input type="radio" class="btn-check" name="paytype" id="payhouse1" autocomplete="off"
+                            placeholder="ช่องทางชำระเงิน" value="เงินสด">
+                        <label class="btn btn-outline-primary w-100" for="payhouse1">เงินสด</label>
+                    </div>
+                    <div class="col-6 mb-1">
+                        <input type="radio" class="btn-check" name="paytype" id="payhouse2" autocomplete="off"
+                            placeholder="ช่องทางชำระเงิน" value="โอนจ่าย">
+                        <label class="btn btn-outline-primary w-100" for="payhouse2">โอนจ่าย</label>
+                    </div>
+                    <div class="typepay5"></div>
+                    <div class="col-12 mb-1">
+                        <button class="btn btn-primary w-100 savehouseoutsidedeposit">บันทึกข้อมูล</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="listpoolvilla mt-5">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3">รายการบ้านพัก </legend>
+                    <div class="cardContainer row"></div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="formpoolvilla mt-5" id="formpoolvilla">
+        <div class="container">
+            <div class="row">
+                <button class="btn btn-outline-danger w-100 navigate-button backhome"
+                    data-target=".listpoolvilla">กลับหน้าหลัก</button>
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3 textedit"> </legend>
+                    <span class="textedit d-none" id="textedit"></span>
+                    <span class="houseedit d-none" id="houseedit"></span>
+                    <div class="row">
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">ข้อมูลผู้เข้าพัก</legend>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ชื่อผู้จอง"
+                                        aria-label="ชื่อผู้จอง" id="name" autocomplete="name">
+                                    <label for="name">ชื่อผู้จอง</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="เบอร์ติดต่อ"
+                                        aria-label="เบอร์ติดต่อ" inputmode="tel" id="tel" maxlength="10"
+                                        autocomplete="tel">
+                                    <label for="tel">เบอร์ติดต่อ</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="Facebook" aria-label="Facebook"
+                                        id="facebook">
+                                    <label for="facebook">Facebook</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="Line" aria-label="Line"
+                                        id="line">
+                                    <label for="line">Line</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ช่องทางการจอง"
+                                        aria-label="ช่องทางการจอง" id="bookinguser">
+                                    <label for="bookinguser">ช่องทางการจอง</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="หมายเหตุเพิ่มเติม"
+                                        aria-label="หมายเหตุเพิ่มเติม" id="bookingnote">
+                                    <label for="bookingnote">หมายเหตุเพิ่มเติม</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">วันที่เข้าพัก</legend>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="วันที่เข้าพัก"
+                                        aria-label="วันที่เข้าพัก" id="timestart">
+                                    <label for="timestart">ตั้งแต่วันที่</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-2 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="time" placeholder="เวลา" aria-label="เวลา"
+                                        id="starttime">
+                                    <label for="starttime">เวลา</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ถึงวันที่"
+                                        aria-label="ถึงวันที่" id="timeend">
+                                    <label for="timeend">ถึงวันที่</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-2 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="time" placeholder="เวลา" aria-label="เวลา"
+                                        id="endtime">
+                                    <label for="endtime">เวลา</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-2 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="จำนวนวันเข้าพัก"
+                                        aria-label="จำนวนวันเข้าพัก" id="timevalue" disabled>
+                                    <label for="timevalue">จำนวนวันเข้าพัก</label>
+                                </div>
+                            </div>
+                        </fieldset>
+
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                            <legend class="float-none w-auto px-3">ราคาต่อคืน</legend>
+                            <div class="nights row"></div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">รายละเอียดการเข้าพัก</legend>
+                            <div class="col-12 col-md-4 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="จำนวนผู้เข้าพัก" aria-label="จำนวนผู้เข้าพัก" id="quser">
+                                    <label for="quser">ผู้เข้าพัก(จำนวน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric" placeholder="จำนวนห้อง"
+                                        aria-label="จำนวนห้อง" id="qroom">
+                                    <label for="qroom">ห้อง(จำนวน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-4 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="จำนวนที่นอนเสริม" aria-label="จำนวนที่นอนเสริม" id="qbed">
+                                    <label for="qbed">ที่นอนเสริม(จำนวน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="จำนวนอาหารเช้า"
+                                        aria-label="จำนวนอาหารเช้า" id="tfood">
+                                    <label for="tfood">อาหารเช้า(เมนู)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="อาหารเช้าจำนวนเซ็ท" aria-label="อาหารเช้าจำนวนเซ็ท" id="qfood">
+                                    <label for="qfood">อาหารเช้า(จำนวนเซ็ท)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ชนิดสัตว์เลี้ยง"
+                                        aria-label="ชนิดสัตว์เลี้ยง" id="tanimal">
+                                    <label for="tanimal">สัตว์เลี้ยง(ชนิด)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="จำนวนสัตว์เลี้ยง" aria-label="จำนวนสัตว์เลี้ยง" id="qanimal">
+                                    <label for="qanimal">สัตว์เลี้ยง(จำนวน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="กรณีเข้าพักเกิน" aria-label="กรณีเข้าพักเกิน" id="pdfedti1"
+                                        value="16">
+                                    <label for="pdfedti1">กรณีเข้าพักเกิน(ท่าน)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-6 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" inputmode="numeric"
+                                        placeholder="เสริมที่นอนปิกนิก" aria-label="เสริมที่นอนปิกนิก" id="pdfedti2"
+                                        value="700">
+                                    <label for="pdfedti2">เสริมที่นอนปิกนิก(ท่านละ)</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">รายละเอียดราคา</legend>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาที่พัก"
+                                        aria-label="ราคาที่พัก" id="totalroom" disabled>
+                                    <label for="totalroom">ที่พัก(ราคา)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาอาหารเช้า"
+                                        aria-label="ราคาอาหารเช้า" inputmode="numeric" id="totalfood">
+                                    <label for="totalfood">อาหารเช้า(บาท)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาที่นอนเสริม"
+                                        aria-label="ราคาที่นอนเสริม" inputmode="numeric" id="totalbed">
+                                    <label for="totalbed">ที่นอนเสริม(บาท)</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-3 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาสัตว์เลี้ยง"
+                                        aria-label="ราคาสัตว์เลี้ยง" inputmode="numeric" id="totalanimal">
+                                    <label for="totalanimal">สัตว์เลี้ยง(บาท)</label>
+                                </div>
+                            </div>
+
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                            <legend class="float-none w-auto px-3">ของแถม</legend>
+                            <div class="row row-cols-2 row-cols-sm-3 row-cols-md-6 g-3">
+
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="free_1" autocomplete="off"
+                                        value="น้ำแข็ง">
+                                    <label class="btn btn-outline-primary w-100" for="free_1">น้ำแข็ง</label>
+                                    <div class="form-floating d-none mt-2" id="input-col-1">
+                                        <input class="form-control" type="text" placeholder="จำนวนน้ำแข็ง"
+                                            aria-label="จำนวนน้ำแข็ง" inputmode="numeric" id="free_price_1">
+                                        <label for="free_price_1">จำนวน(กระสอบ)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="free_2" autocomplete="off"
+                                        value="น้ำดื่ม">
+                                    <label class="btn btn-outline-primary w-100" for="free_2">น้ำดื่ม</label>
+                                    <div class="form-floating d-none mt-2" id="input-col-2">
+                                        <input class="form-control" type="text" placeholder="จำนวนน้ำดื่ม"
+                                            aria-label="จำนวนน้ำดื่ม" inputmode="numeric" id="free_price_2">
+                                        <label for="free_price_2">จำนวน(แพ็ค)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="free_3" autocomplete="off"
+                                        value="ถ่านปิ่งย่าง">
+                                    <label class="btn btn-outline-primary w-100" for="free_3">ถ่านปิ่งย่าง</label>
+                                    <div class="form-floating d-none mt-2" id="input-col-3">
+                                        <input class="form-control" type="text" placeholder="จำนวนถ่านปิ่งย่าง"
+                                            aria-label="จำนวนถ่านปิ่งย่าง" inputmode="numeric" id="free_price_3">
+                                        <label for="free_price_3">จำนวน(ถุง)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="free_4" autocomplete="off"
+                                        value="อาหารเช้า">
+                                    <label class="btn btn-outline-primary w-100" for="free_4">อาหารเช้า</label>
+                                    <div class="form-floating d-none mt-2" id="input-col-4">
+                                        <input class="form-control" type="text" placeholder="จำนวนอาหารเช้า"
+                                            aria-label="จำนวนอาหารเช้า" inputmode="numeric" id="free_price_4">
+                                        <label for="free_price_4">จำนวน(เซ็ท)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="free_5" autocomplete="off"
+                                        value="ที่นอนเสริม">
+                                    <label class="btn btn-outline-primary w-100" for="free_5">ที่นอนเสริม</label>
+                                    <div class="form-floating d-none mt-2" id="input-col-5">
+                                        <input class="form-control" type="text" placeholder="จำนวนที่นอนเสริม"
+                                            aria-label="จำนวนที่นอนเสริม" inputmode="numeric" id="free_price_5">
+                                        <label for="free_price_5">จำนวน(ที่)</label>
+                                    </div>
+                                </div>
+
+                                <div class="col">
+                                    <input type="checkbox" class="btn-check" id="free_6" autocomplete="off"
+                                        value="สัตว์เลี้ยง">
+                                    <label class="btn btn-outline-primary w-100" for="free_6">สัตว์เลี้ยง</label>
+                                    <div class="form-floating d-none mt-2" id="input-col-6">
+                                        <input class="form-control" type="text" placeholder="จำนวนสัตว์เลี้ยง"
+                                            aria-label="จำนวนสัตว์เลี้ยง" inputmode="numeric" id="free_price_6">
+                                        <label for="free_price_6">จำนวน(ตัว)</label>
+                                    </div>
+                                </div>
+
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">ค่าประกันบ้านพัก</legend>
+                            <div class="col-12 col-md-12 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ราคาค่าประกันบ้านพัก"
+                                        aria-label="ราคาค่าประกันบ้านพัก" inputmode="numeric" id="totalhouse">
+                                    <label for="totalhouse"> ค่าประกันบ้านพัก(ยอด)</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                            <legend class="float-none w-auto px-3">สรุปค่าที่พัก</legend>
+                            <div class="addpaytotal"></div>
+                            <div class="col-12 col-md-12 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="รวมราคาทั้งสิ้น"
+                                        aria-label="รวมราคาทั้งสิ้น" id="totalall" disabled>
+                                    <label for="totalall">รวมราคาทั้งสิ้น</label>
+                                </div>
+                            </div>
+                            <div class="col-12 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="ค้างชำระอีก"
+                                        aria-label="ค้างชำระอีก" id="overdue" disabled>
+                                    <label for="overdue">ค้างชำระอีก</label>
+                                </div>
+                            </div>
+                            <div class="col-12 col-md-12 mb-1">
+                                <div class="form-floating">
+                                    <input class="form-control" type="text" placeholder="หมายเหตุ" aria-label="หมายเหตุ"
+                                        id="note">
+                                    <label for="note">หมายเหตุ(หากมี)</label>
+                                </div>
+                            </div>
+                        </fieldset>
+                        <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row payment">
+                            <legend class="float-none w-auto px-3">ช่องทางการชำระเงิน</legend>
+                            <div class="col-6 mb-1">
+                                <input type="radio" class="btn-check" name="paytype" id="pay_1" autocomplete="off"
+                                    placeholder="ช่องทางชำระเงิน" value="เงินสด">
+                                <label class="btn btn-outline-primary w-100" for="pay_1">เงินสด</label>
+                            </div>
+                            <div class="col-6 mb-1">
+                                <input type="radio" class="btn-check" name="paytype" id="pay_2" autocomplete="off"
+                                    placeholder="ช่องทางชำระเงิน" value="โอนจ่าย">
+                                <label class="btn btn-outline-primary w-100" for="pay_2">โอนจ่าย</label>
+                            </div>
+                            <div class="col-6 mb-1">
+                                <input type="radio" class="btn-check" name="paydeposit" id="deposit1" autocomplete="off"
+                                    placeholder="สถานะมัดจำ" value="แบ่งมัดจำ">
+                                <label class="btn btn-outline-primary w-100" for="deposit1">แบ่งมัดจำ</label>
+                            </div>
+                            <div class="col-6 mb-1">
+                                <input type="radio" class="btn-check" name="paydeposit" id="deposit2" autocomplete="off"
+                                    placeholder="สถานะมัดจำ" value="ไม่แบ่งมัดจำ">
+                                <label class="btn btn-outline-primary w-100" for="deposit2">ไม่แบ่งมัดจำ</label>
+                            </div>
+                            <div class="typepay"></div>
+                        </fieldset>
+                        <div class="col-12 mb-1">
+                            <button class="btn btn-primary w-100 savepool">บันทึกการจอง</button>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="revenuelist mt-5">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3">รายการค้างชำระ</legend>
+                    <div class="row">
+                        <div class="col-12 mb-1">
+                            <div class="form-floating position-relative">
+                                <input class="form-control pe-5" type="text" placeholder="ค้นหาข้อมูล"
+                                    aria-label="ค้นหาข้อมูล" id="searchuser">
+                                <label for="searchuser">ค้นหาข้อมูล</label>
+                            </div>
+                        </div>
+                        <div class="col-12">
+                            <div id="controls-container"
+                                class="d-flex justify-content-between align-items-center flex-wrap mb-1 rounded shadow-sm theme-dependent">
+                                <div id="dropdown-container" class="d-flex align-items-center">
+                                    <label for="userlistSelect" class="form-label me-2">แสดงรายการ:</label>
+                                    <select id="userlistSelect" class="form-select" style="width: auto;">
+                                    </select>
+                                </div>
+
+                                <nav id="shoplist-container" aria-label="Pagination">
+                                    <ul id="userlistpage" class="pagination mb-0"></ul>
+                                </nav>
+                            </div>
+                            <div id="usertables">
+                            </div>
+
+                        </div>
+
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="paydeposit mt-5" id="paydeposit">
+        <div class="container">
+            <div class="row">
+                <button class="btn btn-outline-danger w-100 navigate-button backhome"
+                    data-target=".revenuelist">กลับหน้าหลัก</button>
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                    <legend class="float-none w-auto px-3">ชำระงวดที่ 2</legend>
+                    <span class="idlist d-none" id="idlist"></span>
+                    <div class="col-12 col-md-12 mb-1">
+                        <div class="form-floating">
+                            <input class="form-control" type="text" placeholder="ยอดค้างชำระ(จำนวน)"
+                                aria-label="ยอดค้างชำระ(จำนวน)" id="paydepositadd" disabled>
+                            <label for="paydepositadd"> ยอดค้างชำระ(จำนวน)</label>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-1">
+                        <input type="radio" class="btn-check" name="paytype" id="pay_11" autocomplete="off"
+                            placeholder="ช่องทางชำระเงิน" value="เงินสด">
+                        <label class="btn btn-outline-primary w-100" for="pay_11">เงินสด</label>
+                    </div>
+                    <div class="col-6 mb-1">
+                        <input type="radio" class="btn-check" name="paytype" id="pay_22" autocomplete="off"
+                            placeholder="ช่องทางชำระเงิน" value="โอนจ่าย">
+                        <label class="btn btn-outline-primary w-100" for="pay_22">โอนจ่าย</label>
+                    </div>
+                    <div class="typepay2"></div>
+                    <div class="col-12 mb-1">
+                        <button class="btn btn-primary w-100 savepaydeposit">บันทึกข้อมูล</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="checkin mt-5">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3">Check In</legend>
+                    <div class="row">
+                        <div class="col-12 mb-1">
+                            <div class="form-floating position-relative">
+                                <input class="form-control pe-5" type="text" placeholder="ค้นหาข้อมูล"
+                                    aria-label="ค้นหาข้อมูล" id="searchhouse">
+                                <label for="searchhouse">ค้นหาข้อมูล</label>
+                            </div>
+                            <div id="housetable" class="mt-1 row"></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="checkout mt-5">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3">Check Out</legend>
+                    <div class="row">
+                        <div class="col-12 mb-1">
+                            <div class="form-floating position-relative">
+                                <input class="form-control pe-5" type="text" placeholder="ค้นหาข้อมูล"
+                                    aria-label="ค้นหาข้อมูล" id="searchhouse2">
+                                <label for="searchhouse2">ค้นหาข้อมูล</label>
+                            </div>
+                            <div id="housetable2" class="mt-1 row"></div>
+                        </div>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <div class="modal fade" id="previewModal" tabindex="-1" aria-labelledby="previewModalLabel">
+        <div class="modal-dialog modal-a4">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="previewModalLabel">เอกสาร PDF</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <iframe id="linkpdf" src="" style="width:100%; height:80vh; border:none;">
+                    </iframe>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        ปิด
+                    </button>
+                    <button type="button" class="btn btn-primary openPdfInNewWindow">เปิด PDF
+                        ในหน้าต่างใหม่</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <main class="addsdeposit mt-5" id="addsdeposit">
+        <div class="container">
+            <div class="row">
+                <button class="btn btn-outline-danger w-100 navigate-button backhome"
+                    data-target=".checkin">กลับหน้าหลัก</button>
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                    <legend class="float-none w-auto px-3">เพิ่มรายรับ</legend>
+                    <span class="idlists d-none" id="idlists"></span>
+                    <div class="col-12 col-md-12 mb-1">
+                        <div class="form-floating">
+                            <select class="form-select" aria-label="รายรับ" id="depositlist"
+                                aria-placeholder="เลือกรายรับ">
+                                <option data-default="true" value="" selected disabled>เลือกรายรับ</option>
+                            </select>
+                            <label for="depositlist">รายรับ</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-12 mb-1 totalguide">
+                        <div class="form-floating">
+                            <input class="form-control" id="totalguides1" type="text" placeholder="ยอดค้างชำระ"
+                                aria-label="ยอดค้างชำระ" disabled>
+                            <label for="totalguides1">ยอดค้างชำระ</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-12 mb-1 totalguide">
+                        <div class="form-floating">
+                            <input class="form-control" id="totalguides2" type="text" placeholder="ค่าประกัน"
+                                aria-label="ค่าประกัน" disabled>
+                            <label for="totalguides2">ค่าประกัน</label>
+                        </div>
+                    </div>
+                    <div class="col-12 col-md-12 mb-1 totalguide">
+                        <div class="form-floating">
+                            <input class="form-control" id="totalguides3" type="text" placeholder="ยอดรวมทั้งสิ้น"
+                                aria-label="ยอดรวมทั้งสิ้น" disabled>
+                            <label for="totalguides3">ยอดรวมทั้งสิ้น</label>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-1">
+                        <input type="radio" class="btn-check" name="paytype" id="pay_111" autocomplete="off"
+                            placeholder="ช่องทางชำระเงิน" value="เงินสด">
+                        <label class="btn btn-outline-primary w-100" for="pay_111">เงินสด</label>
+                    </div>
+                    <div class="col-6 mb-1">
+                        <input type="radio" class="btn-check" name="paytype" id="pay_222" autocomplete="off"
+                            placeholder="ช่องทางชำระเงิน" value="โอนจ่าย">
+                        <label class="btn btn-outline-primary w-100" for="pay_222">โอนจ่าย</label>
+                    </div>
+                    <div class="typepay3"></div>
+                    <div class="col-12 mb-1">
+                        <button class="btn btn-primary w-100 savedeposit">บันทึกข้อมูล</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="withdrawal mt-5" id="withdrawal">
+        <div class="container">
+            <div class="row">
+                <button class="btn btn-outline-danger w-100 navigate-button backhome"
+                    data-target=".checkin">กลับหน้าหลัก</button>
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                    <legend class="float-none w-auto px-3">Check Out</legend>
+                    <span class="idlists d-none" id="idlists"></span>
+                    <div class="col-12 mb-1">
+                        <div class="form-floating">
+                            <input class="form-control" type="text" placeholder="ค่าประกันคงเหลือ"
+                                aria-label="ค่าประกันคงเหลือ" id="disval" disabled>
+                            <label for="disval">ค่าประกันคงเหลือ</label>
+                        </div>
+                    </div>
+                    <div class="col-6 mb-1">
+                        <input type="radio" class="btn-check" name="paytype" id="pay_1111" autocomplete="off"
+                            placeholder="ช่องทางชำระเงิน" value="เงินสด">
+                        <label class="btn btn-outline-primary w-100" for="pay_1111">เงินสด</label>
+                    </div>
+                    <div class="col-6 mb-1">
+                        <input type="radio" class="btn-check" name="paytype" id="pay_2222" autocomplete="off"
+                            placeholder="ช่องทางชำระเงิน" value="โอนจ่าย">
+                        <label class="btn btn-outline-primary w-100" for="pay_2222">โอนจ่าย</label>
+                    </div>
+                    <div class="typepay4"></div>
+                    <div class="col-12 mb-1">
+                        <button class="btn btn-primary w-100 savewithdrawal">บันทึกข้อมูล</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="foodmenu mt-5">
+        <div class="container">
+            <div class="row">
+                <button class="btn btn-outline-danger w-100 navigate-button backhome"
+                    data-target=".checkin">กลับหน้าหลัก</button>
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                    <legend class="float-none w-auto px-3">เมนูอาหาร</legend>
+                    <span class="idlist d-none" id="idlist"></span>
+                    <span class="namehouse d-none" id="namehouse"></span>
+                    <div class="col-12 mb-3">
+                        <input type="text" id="searchInput" class="form-control" placeholder="ค้นหาเมนูอาหาร">
+                    </div>
+                    <div class="col-6 text-end">
+                        <button class="btn btn-primary w-100 addmenu navigate-button" data-target=".addmenus">
+                            เพิ่มเมนูอาหาร
+                        </button>
+                    </div>
+                    <div class="col-6 text-end">
+                        <button class="btn btn-success w-100 viewCart">
+                            ดูตะกร้า (<span id="cartCount">0</span>)
+                        </button>
+                    </div>
+                    <div class="listmenu" id="listmenu"></div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="addmenus mt-5" id="addmenus">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row">
+                    <legend class="float-none w-auto px-3">เพิ่มเมนูอาหาร</legend>
+                    <div class="col-12 mb-1">
+                        <div class="form-floating">
+                            <input class="form-control" type="text" placeholder="ชื่อเมนู" aria-label="ชื่อเมนู"
+                                id="nmenu">
+                            <label for="nmenu">ชื่อเมนู</label>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-1">
+                        <div class="form-floating">
+                            <input class="form-control" type="text" placeholder="ราคา" aria-label="ราคา" id="pmenu"
+                                inputmode="numeric">
+                            <label for="pmenu">ราคา</label>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-1">
+                        <div class="form-floating">
+                            <input class="form-control" type="text" placeholder="ประเภท" aria-label="ประเภท" id="tmenu">
+                            <label for="tmenu">ประเภท</label>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-1">
+                        <div class="form-floating">
+                            <input class="form-control" type="text" placeholder="หมวดหมู่" aria-label="หมวดหมู่"
+                                id="lmenu">
+                            <label for="lmenu">หมวดหมู่</label>
+                        </div>
+                    </div>
+                    <div class="col-12 mb-1">
+                        <button class="btn btn-primary w-100 saveaddmenus">บันทึกข้อมูล</button>
+                    </div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+    <script src="link.js"></script>
+    <script src="script.js"></script>
+    <script src="functionlist.js"></script>
+
+</body>
+
+</html>
