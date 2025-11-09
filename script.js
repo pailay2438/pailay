@@ -1336,6 +1336,9 @@ function populateTable(data) {
         const rowData = finalData[rowIndex];
         let roomDataStr = $(this).attr('data-room');
         let roomData = null;
+        console.log(rowData)
+        console.log(rowIndex)
+        console.log(roomDataStr)
         if (roomDataStr) {
             try {
                 roomData = JSON.parse(roomDataStr);
