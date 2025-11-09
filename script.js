@@ -1344,6 +1344,7 @@ function populateTable(data) {
             }
         }
         showhidepage('.paydeposit,nav')
+        console.log(roomData)
         $('.idlist').text(roomData[0])
         $('#paydepositadd').val(rowData[10])
     });
