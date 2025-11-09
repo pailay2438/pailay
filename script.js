@@ -1338,7 +1338,6 @@ function populateTable(data) {
         let roomData = null;
         console.log(rowData)
         console.log(rowIndex)
-        console.log(roomDataStr)
         if (roomDataStr) {
             try {
                 roomData = JSON.parse(roomDataStr);
@@ -1347,6 +1346,7 @@ function populateTable(data) {
             }
         }
         showhidepage('.paydeposit,nav')
+        console.log(roomDataStr)
         console.log(roomData)
         $('.idlist').text(roomData[0])
         $('#paydepositadd').val(rowData[10])
