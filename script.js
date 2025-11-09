@@ -1359,7 +1359,7 @@ function populateTable(data) {
         clearForm('info');
         const rowIndex = $(this).data('row');
         const rowData = finalData[rowIndex];
-        let roomDataStr = $(this).attr('data-room');
+        let roomDataStr = $(this).data('data-room');
         let roomData = null;
         if (roomDataStr) {
             try {
