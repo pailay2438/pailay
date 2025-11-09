@@ -1338,6 +1338,7 @@ function populateTable(data) {
         let roomData = null;
         console.log(rowData)
         console.log(rowIndex)
+        console.log(finalData)
         if (roomDataStr) {
             try {
                 roomData = JSON.parse(roomDataStr);
