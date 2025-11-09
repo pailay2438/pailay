@@ -1298,88 +1298,88 @@ $(window).on("resize", function () {
 });
 
 function populateTable(data) {
-    let depositData = data.filter(row => row[8] === "แบ่งมัดจำ");
+  // 1) คัดเฉพาะ "แบ่งมัดจำ" + ตัดซ้ำด้วย id จากคอลัมน์ที่ 1
+  const depositData = data.filter(row => row[8] === "แบ่งมัดจำ");
+  const idCounts = {};
+  depositData.forEach(row => { const id = row[1]; idCounts[id] = (idCounts[id] || 0) + 1; });
+  const finalData = depositData.filter(row => idCounts[row[1]] === 1);
 
-    let idCounts = {};
-    depositData.forEach(row => {
-        let id = row[1];
-        idCounts[id] = (idCounts[id] || 0) + 1;
-    });
-    let finalData = depositData.filter(row => idCounts[row[1]] === 1);
+  const columns = [0,1,2,3,4,5,6,7,8,9,10];
+  const cardContainer = $('#usertables').empty();
 
-    let columns = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
-    let cardContainer = $('#usertables');
-    cardContainer.empty();
+  // 2) ค้นหาด้วยข้อความ + ให้ roomlist match ด้วย row[1]
+  const q = ($('#searchuser').val() || '').toLowerCase().trim();
+  const filteredData = finalData.filter(row => {
+    const dataMatches = row.some(cell => cell && cell.toString().toLowerCase().includes(q));
+    const matchingRoom = roomlist.find(room => room[0] === row[1]); // ✅ ใช้ row[1]
+    const roomMatches = matchingRoom ? matchingRoom.some(cell => cell && cell.toString().toLowerCase().includes(q)) : false;
+    return dataMatches || roomMatches;
+  });
 
-    let searchuserValue = $('#searchuser').val().toLowerCase().trim();
-    let filteredData = finalData.filter(row => {
-        let dataMatches = row.some(cell => cell && cell.toString().toLowerCase().includes(searchuserValue));
-        let matchingRoom = roomlist.find(room => room[0] === row[0]);
-        let roomMatches = matchingRoom ? matchingRoom.some(cell => cell && cell.toString().toLowerCase().includes(searchuserValue)) : false;
-        return dataMatches || roomMatches;
-    });
+  // 3) แบ่งหน้า (totalPages = จำนวนรายการต่อหน้าในโค้ดเดิม)
+  const pageSize = totalPages; // เพื่อคงตัวแปรเดิม
+  const startIndex = (currentPage - 1) * pageSize;
+  const endIndex   = startIndex + pageSize;
+  const pageData   = filteredData.slice(startIndex, endIndex);
 
-    let startIndex = (currentPage - 1) * totalPages;
-    let endIndex = startIndex + totalPages;
-    let pageData = filteredData.slice(startIndex, endIndex);
+  // 4) วาดการ์ด + ฝัง data-room แบบ "attr" (เข้ารหัสก่อน)
+  pageData.forEach((row, idx) => {
+    const actualIndex = startIndex + idx;         // index จริงใน filteredData
+    const html = createCardHtml(row, actualIndex, columns);
 
-    pageData.forEach(function (row, idx) {
-        let actualIndex = startIndex + idx;
-        let newCard = createCardHtml(row, actualIndex, columns);
-        cardContainer.append(newCard);
-    });
+    const matchingRoom = roomlist.find(r => r[0] === row[1]) || [];
+    const roomJsonAttr = encodeURIComponent(JSON.stringify(matchingRoom)); // ✅ ปลอดภัยสำหรับ attribute
 
-    $('.clickable-card').on('click', function (e) {
-        e.preventDefault();
-        clearForm('info');
-        const rowIndex = $(this).data('row');
-        const rowData = finalData[rowIndex];
-        let roomDataStr = $(this).data('data-room');
-        let roomData = null;
-        console.log(rowData)
-        console.log(rowIndex)
-        console.log(finalData)
-        if (roomDataStr) {
-            try {
-                roomData = JSON.parse(roomDataStr);
-            } catch (err) {
-                console.error("Error parsing roomData JSON:", err);
-            }
-        }
-        showhidepage('.paydeposit,nav')
-        console.log(roomDataStr)
-        console.log(roomData)
-        $('.idlist').text(roomData[0])
-        $('#paydepositadd').val(rowData[10])
-    });
+    // แปลงเป็น jQuery แล้วค่อยใส่แอตทริบิวต์
+    const $card = $(html);
+    $card.attr('data-row', actualIndex);          // อ้างอิงตำแหน่งใน filteredData
+    $card.attr('data-room', roomJsonAttr);        // เก็บเป็น attr ตามที่ต้องการ
+    cardContainer.append($card);
+  });
 
-    $('.edits').on('click', function (e) {
-        e.preventDefault();
-        e.stopPropagation();
-        clearForm('info');
-        const rowIndex = $(this).data('row');
-        const rowData = finalData[rowIndex];
-        let roomDataStr = $(this).data('data-room');
-        let roomData = null;
-        if (roomDataStr) {
-            try {
-                roomData = JSON.parse(roomDataStr);
-            } catch (err) {
-                console.error("Error parsing roomData JSON:", err);
-            }
-        }
-        $('.idlist').text(roomData[0])
-        $('#paydepositadd').val(rowData[10])
-        showhidepage('.paydeposit,nav')
-    });
+  // 5) Handler: ใช้ filteredData + ถอดรหัส roomData จาก attr
+  function getRoomFromAttr(el) {
+    const raw = $(el).attr('data-room') || '';
+    try { return JSON.parse(decodeURIComponent(raw)); } catch (e) { console.error(e); return []; }
+  }
 
+  $('.clickable-card').off('click').on('click', function (e) {
+    e.preventDefault();
+    clearForm('info');
 
-    createPagination('#userlistpage', Math.ceil(filteredData.length / totalPages), currentPage, function (newPage) {
-        currentPage = newPage;
-        populateTable(data);
-    });
+    const rowIndex = Number($(this).attr('data-row'));     // ✅ อิง filteredData
+    const rowData  = filteredData[rowIndex];               // ✅ ถูกชุดข้อมูล
+    const roomData = getRoomFromAttr(this);                // ✅ ไม่ต้อง parse ตรง ๆ
+
+    showhidepage('.paydeposit,nav');
+    $('.idlist').text(roomData[0] || '');                  // กัน null
+    $('#paydepositadd').val(rowData?.[10] ?? '');          // กัน undefined
+  });
+
+  $('.edits').off('click').on('click', function (e) {
+    e.preventDefault();
+    e.stopPropagation();
+    clearForm('info');
+
+    const rowIndex = Number($(this).attr('data-row'));     // ✅ อิง filteredData
+    const rowData  = filteredData[rowIndex];
+    const roomData = getRoomFromAttr(this);
+
+    $('.idlist').text(roomData[0] || '');
+    $('#paydepositadd').val(rowData?.[10] ?? '');
+    showhidepage('.paydeposit,nav');
+  });
+
+  // 6) เพจิเนชัน (จำนวนหน้า = ceil(ข้อมูล/ต่อหน้า))
+  createPagination('#userlistpage',
+    Math.ceil(filteredData.length / pageSize),
+    currentPage,
+    function (newPage) {
+      currentPage = newPage;
+      populateTable(data);
+    }
+  );
 }
-
 
 function createCardHtml(row, rowIndex, columns) {
     let col0Data = row[0] || '';
