@@ -14,6 +14,7 @@
  *  4. ตอนเปิดแก้ไขใบจอง ดึงค่าคอมเดิมมาแสดง
  *     ถ้าเป็นใบจองเก่าที่ลงค่าคอมไว้ใน AppSheet จะซ่อนกล่องและไม่ส่งค่าคอม
  *  5. ใบเสนอราคาไม่มีกล่องค่าคอม
+ *  6. ฟอร์มบ้านในเครือมีช่อง "ข้อความลงตารางนายหน้า" (เติม "จอง K.ชื่อผู้จอง" ให้ก่อน แก้ได้)
  *
  * ถ้าไฟล์นี้โหลดไม่ขึ้น ฟอร์มเดิมยังทำงานได้ตามปกติ (แค่ไม่มีค่าคอม)
  */
@@ -32,7 +33,9 @@
     loading: null,
     editUid: '',
     editChannel: null,   // ช่องทางเดิมของใบจองที่เปิดแก้ไข (ข้อมูลเก่าอาจไม่ตรงรายการ)
-    editHasRow: true     // ใบจองที่แก้ไขมีแถวค่าคอมในระบบใหม่หรือไม่
+    editHasRow: true,    // ใบจองที่แก้ไขมีแถวค่าคอมในระบบใหม่หรือไม่
+    editHasCal: true,    // ใบจองที่แก้ไขเคยลงตารางผ่านระบบหรือไม่
+    calTouched: false    // ผู้ใช้แก้ข้อความลงตารางเองแล้ว (หยุดเติมอัตโนมัติ)
   };
 
   var FORMS = {
@@ -101,6 +104,50 @@
       '</fieldset>';
   }
 
+  /* ---- ข้อความลงตารางนายหน้า (เฉพาะบ้านในเครือ) ---- */
+
+  function calBoxHtml() {
+    return '' +
+      '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row cal-box">' +
+      '  <legend class="float-none w-auto px-3">ลงตารางนายหน้า</legend>' +
+      '  <div class="col-12 mb-1 cal-text-wrap">' +
+      '    <div class="form-floating">' +
+      '      <input class="form-control" type="text" placeholder="ข้อความลงตาราง" data-cal="text">' +
+      '      <label>ข้อความลงตาราง (ลงทุกคืนที่พัก)</label>' +
+      '    </div>' +
+      '  </div>' +
+      '  <div class="col-12 small text-muted mt-1 cal-hint">ระบบจะลงข้อความนี้ในชีทตารางนายหน้าตามวันที่พัก และแจ้งในกลุ่ม Lark "ใบจอง"</div>' +
+      '</fieldset>';
+  }
+
+  function calBox() { return $(FORMS.pool.form + ' .cal-box'); }
+  function calInput() { return calBox().find('[data-cal="text"]'); }
+  function calDefault() {
+    var n = String($('#name').val() || '').trim();
+    return n ? 'จอง K.' + n : '';
+  }
+  function calActive() { return !(state.editUid && !state.editHasCal); }
+
+  function calRefresh() {
+    var $b = calBox();
+    if (!$b.length) return;
+    if (!calActive()) {
+      $b.find('.cal-text-wrap').hide();
+      $b.find('.cal-hint').text('ใบจองนี้ลงตารางนายหน้าด้วยมือ ระบบจะไม่แตะตาราง (แก้ที่ชีทตารางโดยตรง)');
+    } else {
+      $b.find('.cal-text-wrap').show();
+      $b.find('.cal-hint').text('ระบบจะลงข้อความนี้ในชีทตารางนายหน้าตามวันที่พัก และแจ้งในกลุ่ม Lark "ใบจอง"');
+      if (!state.calTouched) calInput().val(calDefault());
+    }
+  }
+
+  function calReset() {
+    state.calTouched = false;
+    state.editHasCal = true;
+    calInput().val('');
+    calRefresh();
+  }
+
   function injectBoxes() {
     Object.keys(FORMS).forEach(function (kind) {
       var $form = $(FORMS[kind].form);
@@ -112,6 +159,8 @@
       $(FORMS[kind].channel).attr('list', 'comm_channel_list').attr('autocomplete', 'off');
     });
     if (!$('#comm_channel_list').length) $('body').append('<datalist id="comm_channel_list"></datalist>');
+    var $pc = box('pool');
+    if ($pc.length && !calBox().length) $pc.before(calBoxHtml());
   }
 
   function fillOptions() {
@@ -288,6 +337,16 @@
     state.editHasRow = true;
     state.editChannel = channelVal('pool');
     resetBox('pool');
+    state.calTouched = true; // ตอนแก้ไขไม่เติมอัตโนมัติ ใช้ข้อความเดิม
+    calInput().val('');
+    api('getcalendar', { uid: uid })
+      .then(function (res) {
+        if (state.editUid !== uid || !res || res.status !== 'success') return;
+        state.editHasCal = !!res.found;
+        if (res.found) calInput().val(res.text || '');
+        calRefresh();
+      })
+      .catch(function (err) { console.error('calendar edit', err); });
     api('getcommission', { uid: uid })
       .then(function (res) {
         if (state.editUid !== uid) return; // เปลี่ยนใบจองไปแล้ว
@@ -316,6 +375,10 @@
       return 'ช่องทางการจองต้องเลือกจากรายการ (ถ้าไม่มี ให้เพิ่มในแท็บตั้งค่าของชีทค่าคอมก่อน)';
     }
 
+    if (kind === 'pool' && calActive() && !String(calInput().val() || '').trim()) {
+      return 'กรุณากรอกข้อความลงตารางนายหน้า';
+    }
+
     if (!boxActive(kind)) return '';
 
     var g = cleanNum(field(kind, 'g').val());
@@ -333,15 +396,20 @@
   }
 
   function payload(kind) {
-    if (!boxActive(kind)) return { comm_enabled: '0' };
+    var cal = {};
+    if (kind === 'pool') {
+      cal = calActive() ? { cal_enabled: '1', cal_text: String(calInput().val() || '').trim() }
+                        : { cal_enabled: '0' };
+    }
+    if (!boxActive(kind)) return Object.assign({ comm_enabled: '0' }, cal);
     var agent = isAgent(channelVal(kind));
-    return {
+    return Object.assign(cal, {
       comm_enabled: '1',
       comm_staff: agent ? '' : getStaff(kind),
       comm_g: cleanNum(field(kind, 'g').val()),
       comm_h: agent ? '' : cleanNum(field(kind, 'h').val()),
       comm_issuer: field(kind, 'issuer').val() || ''
-    };
+    });
   }
 
   // ตรวจก่อน handler เดิมของปุ่มบันทึก (capture phase ทำงานก่อน jQuery)
@@ -396,6 +464,9 @@
     });
     $(document).on('input change', FORMS_NIGHTS.pool + ',' + FORMS_NIGHTS.out, function () { syncChips('pool'); syncChips('out'); });
 
+    $(document).on('input', '.cal-box [data-cal="text"]', function () { state.calTouched = true; });
+    $(document).on('input change', '#name', function () { if (!state.calTouched && calActive()) calInput().val(calDefault()); });
+
     $(document).on('input change', FORMS.pool.channel, function () { refreshMode('pool'); });
     $(document).on('input change', FORMS.out.channel, function () { refreshMode('out'); });
 
@@ -405,6 +476,7 @@
       state.editChannel = null;
       state.editHasRow = true;
       resetBox('pool');
+      calReset();
       if (!state.channels.length) loadOptions();
     });
 
@@ -417,6 +489,7 @@
         state.editChannel = null;
         state.editHasRow = true;
         resetBox('pool');
+        calReset();
       }
     });
 
@@ -428,6 +501,7 @@
 
     refreshMode('pool');
     refreshMode('out');
+    calRefresh();
 
     // จำนวนคืนถูกคำนวณโดย script.js เดิม (ไม่มี event) → อัปเดตบรรทัดสรุปการแบ่งทุก 1 วินาที
     setInterval(function () {
