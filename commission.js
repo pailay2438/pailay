@@ -7,9 +7,8 @@
  *  1. ช่อง "ช่องทางการจอง" (ทั้งบ้านในเครือและนอกเครือ) มีรายการให้เลือก
  *     ดึงจากแท็บ "ตั้งค่า" ในชีทค่าคอม และตรวจว่าต้องเป็นค่าในรายการ
  *  2. เพิ่มกล่อง "ค่าคอม" ก่อนช่องทางการชำระเงิน
- *       - ช่องทางของเรา: ติ๊กพนักงานปิดการขาย 1-3 คน (หารเท่ากัน) + ค่าคอม Agent (G, ไม่บังคับ) + ค่าคอมแอดมิน (H)
- *       - ช่องทาง Agent: กรอกค่าคอม Agent (G) อย่างเดียว ไม่ต้องเลือกพนักงาน
- *       - ผู้ออกใบจอง: เลือกจากรายชื่อ (เลือกชื่อคนที่ล็อกอินไว้ให้ก่อนถ้าตรงกัน)
+ *       - ช่องทางแอดมิน (คอลัมน์ F แท็บตั้งค่า): ติ๊กพนักงานปิดการขาย 1-3 คน + ผู้ออกใบจอง + ค่าคอมแอดมิน (H)
+ *       - ช่องทางอื่น (เอเจ้น/OTA/Walk in): กรอกค่าคอมเอเจ้น (G) อย่างเดียว (บังคับ ไม่มีใส่ 0)
  *  3. ตอนกดบันทึก แนบค่าคอมไปกับข้อมูลเดิม
  *  4. ตอนเปิดแก้ไขใบจอง ดึงค่าคอมเดิมมาแสดง
  *     ถ้าเป็นใบจองเก่าที่ลงค่าคอมไว้ใน AppSheet จะซ่อนกล่องและไม่ส่งค่าคอม
@@ -30,6 +29,7 @@
     channels: [],
     staff: [],
     issuers: [],
+    own: [],
     loading: null,
     editUid: '',
     editChannel: null,   // ช่องทางเดิมของใบจองที่เปิดแก้ไข (ข้อมูลเก่าอาจไม่ตรงรายการ)
@@ -45,7 +45,12 @@
 
   /* ---------------- helpers ---------------- */
 
-  function isAgent(ch) { return /^\s*agen/i.test(ch || ''); }
+  // งานเอเจ้น = ช่องทางที่ไม่อยู่ในรายการช่องทางแอดมิน (ถ้ายังโหลดรายการไม่ได้ ใช้กติกาเดิม)
+  function isAgent(ch) {
+    ch = String(ch || '').trim();
+    if (!state.own.length) return /^\s*agen/i.test(ch);
+    return state.own.indexOf(ch) === -1;
+  }
 
   function cleanNum(v) { return String(v || '').replace(/[^0-9.]/g, ''); }
 
@@ -90,8 +95,8 @@
       '  </div>' +
       '  <div class="col-6 col-md-6 mb-1 comm-g-wrap">' +
       '    <div class="form-floating">' +
-      '      <input class="form-control" type="text" inputmode="decimal" placeholder="ค่าคอม Agent (G)" data-comm="g">' +
-      '      <label>ค่าคอม Agent (G)</label>' +
+      '      <input class="form-control" type="text" inputmode="decimal" placeholder="ค่าคอมเอเจ้น (G)" data-comm="g">' +
+      '      <label>ค่าคอมเอเจ้น (G)</label>' +
       '    </div>' +
       '  </div>' +
       '  <div class="col-6 col-md-6 mb-1 comm-h-wrap">' +
@@ -304,12 +309,14 @@
     }
 
     $box.show();
-    var agent = isAgent(channelVal(kind));
-    $box.find('.comm-g-wrap, .comm-issuer-wrap').show();
-    $box.find('.comm-staff-wrap, .comm-h-wrap').toggle(!agent);
-    $box.find('.comm-hint').text(agent
-      ? 'งาน Agent: กรอกค่าคอมที่ต้องจ่าย Agent ไม่นับคืนให้พนักงาน'
-      : 'ค่าคอมแอดมิน (H) ใช้คำนวณค่าคอมพนักงานตามเกณฑ์ 25 คืน/เดือน ค่าคอม Agent (G) ไม่บังคับ');
+    var ch = channelVal(kind);
+    var agent = ch ? isAgent(ch) : false;
+    $box.find('.comm-g-wrap').toggle(agent);
+    $box.find('.comm-staff-wrap, .comm-issuer-wrap, .comm-h-wrap').toggle(!agent);
+    $box.find('.comm-hint').text(!ch ? 'เลือกช่องทางการจองก่อน'
+      : (agent
+        ? 'งานเอเจ้น/ช่องทางภายนอก: กรอกค่าคอมเอเจ้น (ไม่มีให้ใส่ 0) ไม่นับคืนให้พนักงาน และไม่นับค่าออกใบจอง'
+        : 'ค่าคอมแอดมิน (H) ใช้คำนวณค่าคอมพนักงานตามเกณฑ์ 25 คืน/เดือน'));
   }
 
   /* ---------------- data ---------------- */
@@ -323,7 +330,10 @@
           // ชื่อเดี่ยวเท่านั้น (ชื่อคู่แบบเดิมไม่ต้องใช้แล้ว เพราะติ๊กได้หลายคน)
           state.staff = (res.staff || []).filter(function (s) { return s.indexOf('+') === -1; });
           state.issuers = res.issuers || [];
+          state.own = res.ownChannels || [];
           fillOptions();
+          refreshMode('pool');
+          refreshMode('out');
         } else {
           state.loading = null;
         }
@@ -385,7 +395,7 @@
     var h = cleanNum(field(kind, 'h').val());
 
     if (isAgent(ch)) {
-      if (!g) return 'กรุณากรอกค่าคอม Agent (G)';
+      if (!g) return 'กรุณากรอกค่าคอมเอเจ้น (ไม่มีให้ใส่ 0)';
       return '';
     }
     var staff = getStaff(kind);
@@ -406,9 +416,9 @@
     return Object.assign(cal, {
       comm_enabled: '1',
       comm_staff: agent ? '' : getStaff(kind),
-      comm_g: cleanNum(field(kind, 'g').val()),
+      comm_g: agent ? cleanNum(field(kind, 'g').val()) : '',
       comm_h: agent ? '' : cleanNum(field(kind, 'h').val()),
-      comm_issuer: field(kind, 'issuer').val() || ''
+      comm_issuer: agent ? '' : (field(kind, 'issuer').val() || '')
     });
   }
 
