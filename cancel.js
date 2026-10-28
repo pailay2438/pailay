@@ -16,7 +16,8 @@
         return String($('#houseedit').text() || '').trim();
     }
 
-    function postCancel(uid, reason) {
+    // from = หน้าที่กดมา ('.formpoolvilla' หน้าแก้ไข / '.checkin' การ์ดเช็คอิน) — ล้มเหลวกลับหน้านั้น สำเร็จไปหน้าที่ควรไป
+    function postCancel(uid, reason, from) {
         showhidepage('header');
         fetch(scriptUrl, {
             method: 'POST',
@@ -34,18 +35,18 @@
                     Swal.fire({ title: res.message, icon: 'success', confirmButtonText: 'ตกลง' }).then(function () {
                         $('#houseedit').text('');
                         clearForm('formpoolvilla');
-                        showhidepage('.listpoolvilla,nav');
+                        showhidepage((from === '.checkin' ? '.checkin' : '.listpoolvilla') + ',nav');
                         getdata();
                     });
                 } else {
                     Swal.fire({ icon: 'error', title: res.message, confirmButtonText: 'ตกลง' }).then(function () {
-                        showhidepage('.formpoolvilla,nav');
+                        showhidepage(from + ',nav');
                     });
                 }
             })
             .catch(function (err) {
                 console.error(err);
-                showhidepage('.formpoolvilla,nav');
+                showhidepage(from + ',nav');
                 Swal.fire({ icon: 'error', title: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', confirmButtonText: 'ตกลง' });
             });
     }
@@ -63,24 +64,29 @@
 
         $wrap.on('click', '.cancel-booking', function () {
             var uid = currentUid();
-            if (!uid) return;
-            Swal.fire({
-                icon: 'warning',
-                title: 'ยกเลิกใบจองนี้?',
-                html: '<b>' + $('.textedit').first().text() + '</b><br>' +
-                    ($('#name').val() || '') + ' · UID ' + uid + '<br>' +
-                    '<small>ใบจองจะถูกย้ายไปแท็บ "ใบจองที่ยกเลิก" วันที่จะว่างให้จองใหม่ ตารางนายหน้าคืนค่าเดิม และแจ้งกลุ่ม Lark</small>',
-                input: 'text',
-                inputPlaceholder: 'เหตุผลที่ยกเลิก (บังคับ)',
-                showCancelButton: true,
-                confirmButtonText: 'ยืนยันยกเลิกใบจอง',
-                cancelButtonText: 'ไม่ยกเลิก',
-                confirmButtonColor: '#dc3545',
-                reverseButtons: true,
-                inputValidator: function (v) { if (!String(v || '').trim()) return 'กรุณาใส่เหตุผล'; }
-            }).then(function (r) {
-                if (r.isConfirmed) postCancel(uid, String(r.value).trim());
-            });
+            if (uid) askCancel(uid, $('.textedit').first().text(), $('#name').val(), '.formpoolvilla');
         });
     });
+
+    // ใช้ร่วมกับปุ่มยกเลิกบนการ์ดเช็คอิน (postpone.js)
+    function askCancel(uid, house, name, from) {
+        Swal.fire({
+            icon: 'warning',
+            title: 'ยกเลิกใบจองนี้?',
+            html: '<b>' + (house || '') + '</b><br>' +
+                (name || '') + ' · UID ' + uid + '<br>' +
+                '<small>ใบจองจะถูกย้ายไปแท็บ "ใบจองที่ยกเลิก" วันที่จะว่างให้จองใหม่ ตารางนายหน้าคืนค่าเดิม และแจ้งกลุ่ม Lark</small>',
+            input: 'text',
+            inputPlaceholder: 'เหตุผลที่ยกเลิก (บังคับ)',
+            showCancelButton: true,
+            confirmButtonText: 'ยืนยันยกเลิกใบจอง',
+            cancelButtonText: 'ไม่ยกเลิก',
+            confirmButtonColor: '#dc3545',
+            reverseButtons: true,
+            inputValidator: function (v) { if (!String(v || '').trim()) return 'กรุณาใส่เหตุผล'; }
+        }).then(function (r) {
+            if (r.isConfirmed) postCancel(uid, String(r.value).trim(), from);
+        });
+    }
+    window.pailayAskCancel = askCancel;
 })();

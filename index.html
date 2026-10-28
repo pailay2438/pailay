@@ -114,6 +114,12 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".postponed" aria-current="page">
+                            ลูกค้าเลื่อนไม่มีกำหนด
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
                             data-bs-target=".navbar-collapse.show" data-target=".quotation" aria-current="page">
                             ออกใบเสนอราคา
                         </a>
@@ -328,14 +334,14 @@
                                 <div class="form-floating">
                                     <input class="form-control" type="text" placeholder="ราคาที่นอนเสริม"
                                         aria-label="ราคาที่นอนเสริม" inputmode="numeric" id="booking_totalbed">
-                                    <label for="booking_totalbed">ที่นอนเสริม(ราคาต่อชุด)</label>
+                                    <label for="booking_totalbed">ที่นอนเสริม(บาท)</label>
                                 </div>
                             </div>
                             <div class="col-12 col-md-3 mb-1">
                                 <div class="form-floating">
                                     <input class="form-control" type="text" placeholder="ราคาสัตว์เลี้ยง"
                                         aria-label="ราคาสัตว์เลี้ยง" inputmode="numeric" id="booking_totalanimal">
-                                    <label for="booking_totalanimal">สัตว์เลี้ยง(ราคาต่อตัว)</label>
+                                    <label for="booking_totalanimal">สัตว์เลี้ยง(บาท)</label>
                                 </div>
                             </div>
                         </fieldset>
@@ -984,6 +990,17 @@
         </div>
     </main>
 
+    <main class="postponed mt-5">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3">ลูกค้าเลื่อนไม่มีกำหนด</legend>
+                    <div id="postponedlist" class="row"></div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
     <main class="checkout mt-5">
         <div class="container">
             <div class="row">
@@ -1192,6 +1209,9 @@
     <script src="menu.js"></script>
     <script src="cache.js"></script>
     <script src="cancel.js"></script>
+    <script src="phone2.js"></script>
+    <script src="checkin.js"></script>
+    <script src="postpone.js"></script>
 
 </body>
 

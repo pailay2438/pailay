@@ -130,8 +130,9 @@ $(document).ready(function () {
         let freeaniVal = parseFloat($("#booking_free_price_6").val().replace(/,/g, "")) || 0;
 
         let totalFoodCost = foodVal * (qfoodVal - freefoodVal);
-        let totalBedCost = bedVal * (qbedVal - freebedVal);
-        let totalAniCost = aniVal * (qaniVal - freeaniVal);
+        // ที่นอนเสริม/สัตว์เลี้ยง: พนักงานใส่ยอดรวมเอง (29 ต.ค. 2569) — ไม่คูณจำนวน
+        let totalBedCost = bedVal;
+        let totalAniCost = aniVal;
 
         let sumTotalAll = roomVal + totalBedCost + totalAniCost + totalFoodCost + totalhouse;
 
