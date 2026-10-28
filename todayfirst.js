@@ -4,6 +4,7 @@
  * ลำดับ: วันนี้ → วันถัดไปเรียงใกล้ไปไกล → ใบที่เลยวันมาแล้วไว้ท้าย
  * การ์ดวันนี้มีป้าย "วันนี้" — script.js วาดการ์ดใหม่ทุกครั้งที่ข้อมูลอัปเดต → จัดลำดับซ้ำด้วย MutationObserver
  * (ข้อมูลการ์ดอ้าง roomlist ของ script.js ผ่าน data-row เหมือน postpone.js)
+ * + เอาปุ่ม "สั่งอาหาร" ออกจากการ์ด (เลิกใช้แล้ว 29 ต.ค. 2569) ปุ่มที่เหลือ เพิ่มรายรับ / Check Out กว้างครึ่งละ
  */
 (function () {
     var LISTS = [
@@ -25,9 +26,24 @@
         return d.getFullYear() * 10000 + (d.getMonth() + 1) * 100 + d.getDate();
     }
 
+    function dropFoodButton(col) {
+        var btn = col.querySelector('.foodmenubutton, .foodmenubutton2');
+        if (!btn) return;
+        var cell = btn.closest('.checkouts');
+        if (!cell) return;
+        var row = cell.parentElement;
+        cell.remove();
+        Array.prototype.forEach.call(row.querySelectorAll('.checkouts.col-4'), function (c) {
+            c.classList.remove('col-4');
+            c.classList.add('col-6');
+        });
+    }
+
     function sortList(list) {
         var box = document.getElementById(list.id);
-        if (!box || typeof roomlist === 'undefined') return;
+        if (!box) return;
+        Array.prototype.forEach.call(box.children, dropFoodButton);
+        if (typeof roomlist === 'undefined') return;
         var today = todayKey();
         var items = Array.prototype.map.call(box.children, function (col, i) {
             var btn = col.querySelector('[data-row]');
