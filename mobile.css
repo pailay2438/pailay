@@ -1,0 +1,48 @@
+/* ปรับการแสดงผลบนมือถือ — โหลดหลัง style.css, ไม่แก้ไฟล์เดิม */
+
+/* fieldset อยู่ใน .row (Bootstrap ให้ width:100%) + margin ซ้ายขวา 4px → ล้นจอ หน้าเลื่อนซ้ายขวาได้ */
+.row > fieldset.me-1.ms-1 {
+    width: calc(100% - 0.5rem);
+}
+
+/* ช่องวันที่ภาษาไทย (mobile.js): ช่องจริงถูกซ่อน (type=hidden) Bootstrap จึงคิดว่ามีค่าแล้ว ป้ายลอยค้าง
+   → ถ้าช่องแสดงผลยังว่างและไม่ได้โฟกัส ให้ป้ายอยู่ตำแหน่งปกติ */
+.form-floating > input.flatpickr-input[type="hidden"] ~ .form-control:placeholder-shown:not(:focus) ~ label {
+    color: inherit;
+    transform: none;
+}
+
+.form-floating > input.flatpickr-input[type="hidden"] ~ .form-control:placeholder-shown:not(:focus) ~ label::after {
+    background-color: transparent;
+}
+
+@media (max-width: 576px) {
+    /* fieldset ซ้อนกัน 2 ชั้น padding ชั้นละ 24px กินพื้นที่ช่องกรอก → ลดเหลือ 12px */
+    fieldset.p-4 {
+        padding: 0.75rem !important;
+    }
+
+    /* ปุ่มกดง่ายขึ้น (เป้านิ้วอย่างน้อย ~44px) */
+    .btn {
+        min-height: 44px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .comm-box .comm-chip {
+        min-height: 40px;
+        padding-left: 0.85rem;
+        padding-right: 0.85rem;
+    }
+
+    .navbar-nav .nav-link {
+        padding-top: 0.75rem;
+        padding-bottom: 0.75rem;
+    }
+
+    /* ปฏิทินเลือกวัน: ไม่ล้นขอบจอ */
+    .flatpickr-calendar {
+        max-width: calc(100vw - 16px);
+    }
+}
