@@ -77,6 +77,8 @@
         $page.find('#pay_111, #pay_222').closest('.col-6').toggle(!isCheckin);
         $page.find('.typepay3').toggle(!isCheckin);
         $page.find('.savedeposit').closest('.col-12').toggle(!isCheckin);
+        // ยอดค้างชำระ / ค่าประกัน / ยอดรวมทั้งสิ้น ใช้เฉพาะรายรับ checkin — รายรับอื่นซ่อน
+        $page.find('.totalguide').toggle(isCheckin);
         $panel().toggle(isCheckin);
         if (isCheckin) {
             fillBanks();
