@@ -16,6 +16,24 @@
     background-color: transparent;
 }
 
+/* การ์ด "บ้านพักนอกเครือ" ท้ายหน้าแรก (menu.js) — ขนาดเท่ารูปบ้านในเครือ (350×200) */
+.outside-card {
+    cursor: pointer;
+}
+
+.outside-card-icon {
+    width: 350px;
+    max-width: 100%;
+    height: 200px;
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 5rem;
+    color: var(--bs-primary);
+    background: var(--bs-tertiary-bg);
+}
+
 @media (max-width: 576px) {
     /* fieldset ซ้อนกัน 2 ชั้น padding ชั้นละ 24px กินพื้นที่ช่องกรอก → ลดเหลือ 12px */
     fieldset.p-4 {
