@@ -783,13 +783,13 @@ function setstatuslogin(itemData) {
                     confirmButtonText: 'ตกลง',
                 }).then(() => {
                     showhidepage('.login')
-                    localStorage.clesr()
+                    localStorage.clear()
                 });
             }
         })
         .catch(err => {
             showhidepage('.login')
-            localStorage.clesr()
+            localStorage.clear()
             console.error(err);
             Swal.fire({
                 icon: 'error',
