@@ -127,12 +127,15 @@
             if (!r.isConfirmed) return;
         }
 
+        var uid = $('#addsdeposit .idlists').text().trim();
+        // เช็คอินแล้วการ์ดไปหน้า "ระหว่างการพัก" (ใบ OTA อยู่หน้า OTA ต่อ) — pages.js
+        var nextPage = window.pailayOta && window.pailayOta.isOta(uid) ? '.otalist' : '.staying';
         showhidepage('header');
         fetch(scriptUrl, {
             method: 'POST',
             body: new URLSearchParams({
                 opt: 'savecheckinsplit',
-                idlists: $('#addsdeposit .idlists').text().trim(),
+                idlists: uid,
                 paydate: paydate,
                 parts: JSON.stringify(parts)
             }),
@@ -142,7 +145,7 @@
             .then(function (res) {
                 if (res.status === 'success') {
                     Swal.fire({ title: res.message, icon: 'success', timer: 2000, showConfirmButton: false }).then(function () {
-                        showhidepage('.checkout,nav');
+                        showhidepage(nextPage + ',nav');
                         getdata();
                         clearForm('addsdeposit');
                         reset();

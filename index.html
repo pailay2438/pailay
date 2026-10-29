@@ -90,20 +90,32 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
-                            data-bs-target=".navbar-collapse.show" data-target=".revenuelist" aria-current="page">
-                            รายการค้างชำระในเครือ
+                            data-bs-target=".navbar-collapse.show" data-target=".quotation" aria-current="page">
+                            ออกใบเสนอราคา
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
-                            data-bs-target=".navbar-collapse.show" data-target=".houseoutsidelist" aria-current="page">
-                            รายการค้างชำระนอกเครือ
+                            data-bs-target=".navbar-collapse.show" data-target=".revenuelist" aria-current="page">
+                            รายการค้างชำระ
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".otalist" aria-current="page">
+                            รายการค้างชำระ OTA
                         </a>
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
                             data-bs-target=".navbar-collapse.show" data-target=".checkin" aria-current="page">
                             Check In
+                        </a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
+                            data-bs-target=".navbar-collapse.show" data-target=".staying" aria-current="page">
+                            ระหว่างการพัก
                         </a>
                     </li>
                     <li class="nav-item">
@@ -120,8 +132,8 @@
                     </li>
                     <li class="nav-item">
                         <a class="nav-link active navigate-button" href="#" data-bs-toggle="collapse"
-                            data-bs-target=".navbar-collapse.show" data-target=".quotation" aria-current="page">
-                            ออกใบเสนอราคา
+                            data-bs-target=".navbar-collapse.show" data-target=".houseoutsidelist" aria-current="page">
+                            รอการเข้าพักบ้านนอกเครือ
                         </a>
                     </li>
 
@@ -481,7 +493,7 @@
         <div class="container">
             <div class="row">
                 <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
-                    <legend class="float-none w-auto px-3">รายการค้างชำระนอกเครือ</legend>
+                    <legend class="float-none w-auto px-3">รอการเข้าพักบ้านนอกเครือ</legend>
                     <div class="row">
                         <div class="col-12 mb-1">
                             <div class="form-floating position-relative">
@@ -1001,6 +1013,42 @@
         </div>
     </main>
 
+    <main class="otalist mt-5">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3">รายการค้างชำระ OTA</legend>
+                    <div class="form-floating position-relative mb-1">
+                        <input class="form-control pe-5" type="text" placeholder="ค้นหาข้อมูล" aria-label="ค้นหาข้อมูล" id="searchota">
+                        <label for="searchota">ค้นหาข้อมูล</label>
+                    </div>
+                    <div class="small text-muted mb-1">ใบจองผ่าน Airbnb / Booking / Agoda — ได้รับเงินจากแพลตฟอร์มภายหลัง วันเข้าพักรับเฉพาะค่าประกัน</div>
+                    <h6 class="mt-2">รอเข้าพัก</h6>
+                    <div id="ota-wait" class="row"></div>
+                    <h6 class="mt-2">ระหว่างพัก / รอรับเงินจากแพลตฟอร์ม</h6>
+                    <div id="ota-stay" class="row"></div>
+                    <div class="ota-empty text-center text-muted py-3">ไม่มีใบจอง OTA ค้าง</div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
+    <main class="staying mt-5">
+        <div class="container">
+            <div class="row">
+                <fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm">
+                    <legend class="float-none w-auto px-3">ระหว่างการพัก</legend>
+                    <div class="form-floating position-relative mb-1">
+                        <input class="form-control pe-5" type="text" placeholder="ค้นหาข้อมูล" aria-label="ค้นหาข้อมูล" id="searchstaying">
+                        <label for="searchstaying">ค้นหาข้อมูล</label>
+                    </div>
+                    <div id="stayinglist" class="row"></div>
+                    <div class="staying-empty text-center text-muted py-3">ไม่มีลูกค้าระหว่างการพัก</div>
+                </fieldset>
+            </div>
+        </div>
+    </main>
+
     <main class="checkout mt-5">
         <div class="container">
             <div class="row">
@@ -1213,6 +1261,9 @@
     <script src="checkin.js"></script>
     <script src="postpone.js"></script>
     <script src="todayfirst.js"></script>
+    <script src="ota.js"></script>
+    <script src="pages.js"></script>
+    <script src="outside.js"></script>
 
 </body>
 
