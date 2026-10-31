@@ -3,6 +3,7 @@
  * การ์ดเช็คอิน (#housetable): ส่วนบนเดิมมี แก้ไขข้อมูล / Check In → เพิ่ม ⏸️ เลื่อนไม่มีกำหนด / ❌ ยกเลิกใบจอง (รวม 4 ปุ่ม)
  * - กดเลื่อน → opt=postponebooking (หลังบ้าน postpone.gs: วันเดิมว่าง + คืนตารางนายหน้า + แจ้ง Lark)
  *   การ์ดถูกซ่อนจากหน้าเช็คอิน แล้วไปแสดงในเมนู "ลูกค้าเลื่อนไม่มีกำหนด" (.postponed)
+ * - หน้าลูกค้าเลื่อน: ปุ่ม "ยกเลิกการเข้าพัก" → cancel.js askCancel (คืนเงิน/ริบมัดจำ) (31 ต.ค. 2569)
  * - กด "กำหนดวันเข้าพักใหม่" → คลิกปุ่มแก้ไขข้อมูลของการ์ดเดิม (ซ่อนอยู่ใน #housetable, handler ของ script.js ยังผูกอยู่)
  *   แล้วล้างวันเข้า-ออกให้เลือกใหม่ → บันทึก = savepools แก้ไข (ออก PDF ใหม่/ลงตารางใหม่) → หลังบ้านเอาออกจากรายการเลื่อน
  * รายการเลื่อนมาจาก doGet data9; roomlist (ใบจองทั้งหมด) เป็นตัวแปร global ของ script.js
@@ -66,6 +67,7 @@
             var $card = $(
                 '<div class="col-md-4 col-12 mb-1"><div class="card mb-1 shadow-sm"><div class="card-body">' +
                 '  <button class="btn btn-outline-success btn-sm w-100 mb-2 pp-reschedule"><i class="bi bi-calendar-plus me-1"></i>กำหนดวันเข้าพักใหม่</button>' +
+                '  <button class="btn btn-outline-danger btn-sm w-100 mb-2 pp-cancel-stay"><i class="bi bi-x-circle me-1"></i>ยกเลิกการเข้าพัก</button>' +
                 '  <div><b>บ้าน:</b> <span class="pp-house"></span></div>' +
                 '  <div><b>ชื่อผู้จอง:</b> <span class="pp-name"></span></div>' +
                 '  <div><b>เบอร์:</b> <span class="pp-tel"></span></div>' +
@@ -83,6 +85,7 @@
             $card.find('.pp-by').text(p[2] || '-');
             $card.find('.pp-uid').text(uid);
             $card.find('.pp-reschedule').attr('data-uid', uid);
+            $card.find('.pp-cancel-stay').attr('data-uid', uid).attr('data-house', b[1] || '').attr('data-name', b[2] || '');
             $box.append($card);
         });
     }
@@ -187,6 +190,11 @@
             e.stopPropagation();
             var row = bookingOfCard(this.closest('.card'));
             if (row && window.pailayAskCancel) window.pailayAskCancel(row[0], row[1], row[2], '.checkin');
+        });
+        // ยกเลิกใบที่เลื่อนอยู่ (คืนเงิน/ริบมัดจำ — cancel.js) → หลังบ้านเอาออกจากรายการเลื่อนด้วย
+        $(document).on('click', '.pp-cancel-stay', function (e) {
+            e.preventDefault();
+            if (window.pailayAskCancel) window.pailayAskCancel(this.getAttribute('data-uid'), this.getAttribute('data-house'), this.getAttribute('data-name'), '.postponed');
         });
         $(document).on('click', '.pp-reschedule', function (e) {
             e.preventDefault();

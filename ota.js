@@ -54,6 +54,7 @@
         if (typeof orig !== 'function') return;
         window.savepool = function (itemData) {
             if (itemData) {
+                if (!itemData.pay_ota) delete itemData.pay_ota; // ค่าว่างจากโหมดแก้ไข ไม่ต้องส่ง
                 var insurance = String(num(itemData.totalhouse));
                 if (itemData.pay_ota) {
                     delete itemData.pay_ota;
@@ -70,6 +71,16 @@
                 }
             }
             return orig.apply(this, arguments);
+        };
+    }
+
+    // ปุ่ม #pay_ota มี id → getFormData เก็บเข้า itemData; ตอนแก้ไขใบจองไม่มีปุ่มชำระเงินถูกเลือก
+    // checkvalue ของ script.js จะบังคับ pay_ota (ไม่อยู่ในรายการยกเว้นเดิม) → ยกเว้นเสมอ (ปุ่ม OTA ตรวจเองด้านล่าง)
+    function wrapCheckvalue() {
+        var orig = window.checkvalue;
+        if (typeof orig !== 'function') return;
+        window.checkvalue = function (formData, excludeFields) {
+            return orig.call(this, formData, (excludeFields || []).concat(['pay_ota']));
         };
     }
 
@@ -175,6 +186,7 @@
         }, true);
 
         wrapSavepool();
+        wrapCheckvalue();
         syncForm();
     });
 })();
