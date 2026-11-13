@@ -76,12 +76,28 @@
             GIFTS.forEach(function (g) { var x = gtext.match(g.re); if (x) o.gifts.push({ n: g.n, label: g.label, qty: Number(x[1]) }); });
         }
 
-        if ((m = flat.match(/ลูกค้า\s*[:：]\s*([^\n]+)/))) o.name = m[1].replace(/^(คุณ|k\.|K\.)\s*/i, '').trim();
-        if ((m = flat.match(/(?:เบอร์|โทร)[^\d\n]*([\d\- ,/]{9,})/))) {
-            var phones = (m[1].match(/0\d[\d\- ]{7,11}\d/g) || []).map(function (p) { return p.replace(/\D/g, ''); }).filter(function (p) { return p.length >= 9 && p.length <= 10; });
-            if (phones.length) o.phones = phones.slice(0, 2);
-        }
-        if ((m = flat.match(/ช่องทาง(?:การจอง)?\s*[:：]\s*([^\n]+)/))) o.channel = m[1].trim();
+        // ลูกค้า/เบอร์/ช่องทาง: อ่านทีละบรรทัด รองรับหลายคำ (14 พ.ย. 2569 — เดิมรู้จักแค่ "ลูกค้า:" "เบอร์:" "ช่องทาง:")
+        //   ตัดอีโมจิ/สัญลักษณ์หน้าบรรทัดก่อน · มีหรือไม่มี ":" ก็ได้ · "ลูกค้าชำระวันพัก…" ไม่นับเป็นชื่อ
+        var lines = t.split('\n').map(function (l) { return l.replace(/[ ​]/g, ' ').replace(/^[^0-9A-Za-zก-๙]+/, '').replace(/\s+/g, ' ').trim(); }).filter(String);
+        var SEP = '\\s*[:：=\\-–]?\\s*';
+        var reName = new RegExp('^(?:ชื่อ\\s*(?:ลูกค้า|ผู้จอง|ผู้เข้าพัก|ผู้ติดต่อ)?|ลูกค้า|ผู้จอง|ผู้เข้าพัก|name)' + SEP + '(.+)$', 'i');
+        var reChan = new RegExp('^(?:ช่องทาง\\s*(?:การจอง|ติดต่อ|ที่จอง|การติดต่อ)?|จองผ่าน|ติดต่อผ่าน|ติดต่อทาง|platform|channel)' + SEP + '(.+)$', 'i');
+        var reLine = new RegExp('^(?:line\\s*(?:id)?|ไลน์\\s*(?:ไอดี)?)\\s*[:：]\\s*(.+)$', 'i');
+        var reFb = new RegExp('^(?:facebook|fb|เฟส(?:บุ๊ก|บุค)?)\\s*[:：]\\s*(.+)$', 'i');
+        lines.forEach(function (l) {
+            var x;
+            if (!o.name && (x = l.match(reName)) && !/ชำระ|จะได้รับ|ท่าน\s*$/.test(x[1])) o.name = x[1].replace(/^(คุณ|k\.|K\s)\s*/i, '').replace(/\s*(เบอร์|โทร|tel).*$/i, '').trim();
+            if (!o.channel && (x = l.match(reChan))) o.channel = x[1].trim();
+            if (!o.line && (x = l.match(reLine))) o.line = x[1].trim();
+            if (!o.fb && (x = l.match(reFb))) o.fb = x[1].trim();
+        });
+        // เบอร์: ทุกเลขที่ขึ้นต้น 0 ยาว 9–10 หลัก (มีขีด/เว้นวรรคได้) ในข้อความ — ไม่ต้องมีคำว่าเบอร์
+        var phones = [];
+        (t.match(/(^|[^\d])(0\d(?:[\s\-.]?\d){7,8})(?!\d)/g) || []).forEach(function (p) {
+            var d = p.replace(/\D/g, '');
+            if ((d.length === 9 || d.length === 10) && phones.indexOf(d) < 0) phones.push(d);
+        });
+        if (phones.length) o.phones = phones.slice(0, 2);
         return o;
     }
 
@@ -135,7 +151,18 @@
         // 2) ลูกค้า
         if (o.name) { setVal('#name', o.name); done.push('ชื่อผู้จอง: ' + o.name); } else { miss.push('ชื่อผู้จอง'); mark($('#name'), 'paste-need'); }
         if (o.phones) { setVal('#tel', o.phones.join(', ')); done.push('เบอร์: ' + o.phones.join(', ')); } else { miss.push('เบอร์ติดต่อ'); mark($('#tel'), 'paste-need'); }
-        if (o.channel) { setVal('#bookinguser', o.channel); done.push('ช่องทาง: ' + o.channel); } else { miss.push('ช่องทางการจอง'); mark($('#bookinguser'), 'paste-need'); }
+        if (o.channel) {
+            // เทียบกับรายการช่องทางในระบบ (datalist ของกล่องค่าคอม) — ค่าคอมตรวจชื่อตอนบันทึก ต้องตรงรายการ
+            var opts = $('#comm_channel_list option').map(function () { return String(this.value || '').trim(); }).get().filter(String);
+            var norm = function (s) { return String(s).toLowerCase().replace(/[\s@._\-]/g, ''); };
+            var want = norm(o.channel), hit = opts.filter(function (x) { return norm(x) === want; })[0] ||
+                opts.filter(function (x) { return norm(x) && (want.indexOf(norm(x)) >= 0 || norm(x).indexOf(want) >= 0); }).sort(function (a, b) { return b.length - a.length; })[0];
+            setVal('#bookinguser', hit || o.channel);
+            if (hit) done.push('ช่องทาง: ' + hit + (hit !== o.channel ? ' (ข้อความเขียนว่า "' + o.channel + '")' : ''));
+            else { warn.push('ช่องทาง "' + o.channel + '" ไม่อยู่ในรายการช่องทางของระบบ — เลือกจากรายการใหม่'); mark($('#bookinguser'), 'paste-need'); }
+        } else { miss.push('ช่องทางการจอง'); mark($('#bookinguser'), 'paste-need'); }
+        if (o.line) { setVal('#line', o.line); done.push('Line: ' + o.line); }
+        if (o.fb) { setVal('#facebook', o.fb); done.push('Facebook: ' + o.fb); }
 
         // 3) วันที่ → script.js สร้างช่องราคาต่อคืนให้
         if (o.start && o.end) {
@@ -208,7 +235,7 @@
         var r = await Swal.fire({
             title: 'วางข้อความปิดการขาย',
             html: '<div style="font-size:.85rem;color:#5a7189;text-align:left">คัดลอกข้อความสรุปจากกลุ่ม Lark "ใบจอง" มาวาง ระบบจะเติมบ้าน วันที่ ราคา มัดจำ ค่าประกัน ของแถม ' +
-                'และ ลูกค้า: / เบอร์: / ช่องทาง: ให้ — <b>ยังไม่บันทึก</b> จนกว่าจะกดบันทึกเอง</div>',
+                'และ ชื่อลูกค้า / เบอร์ / ช่องทาง / Line / Facebook ให้ — <b>ยังไม่บันทึก</b> จนกว่าจะกดบันทึกเอง</div>',
             input: 'textarea',
             inputPlaceholder: 'วางข้อความที่นี่…',
             inputAttributes: { rows: 10, 'aria-label': 'ข้อความปิดการขาย' },
