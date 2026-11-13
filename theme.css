@@ -1,0 +1,337 @@
+/* ธีมฟ้า-ขาว (13 พ.ย. 2569) — โหลดหลัง mobile.css · เปลี่ยนสี/รูปทรงอย่างเดียว ไม่แตะโครงสร้างหรือ id ของฟอร์ม
+ * แนวทาง: หัวหน้าเป็นแถบน้ำเงินไล่ฟ้า (ชื่อหน้า = legend ของ fieldset ชั้นนอก) · การ์ดขาวมุมโค้ง 20px ทับขอบแถบ
+ * · หัวข้อในการ์ด = ป้ายแคปซูลบนขอบ · ปุ่ม/ช่องกรอกมุมมน · รองรับโหมดมืดเดิม (body[data-bs-theme="dark"])
+ * ถอดธีม: ลบ <link href="theme.css"> ใน index.html */
+:root {
+    --pl-navy: #0a3a68;
+    --pl-blue: #1667c7;
+    --pl-sky: #3a9be8;
+    --pl-ice: #eaf3fc;
+    --pl-bg: #f3f8fd;
+    --pl-card: #ffffff;
+    --pl-line: #d5e5f4;
+    --pl-text: #10243a;
+    --pl-muted: #5a7189;
+    --pl-shadow: 0 6px 18px rgba(16, 60, 110, 0.07);
+    --pl-band: 240px;
+    /* สีแบรนด์เดิม (เหลือง) → น้ำเงิน */
+    --text-custom-light: var(--pl-navy);
+    --bg-custom-light: var(--pl-blue);
+    --bs-primary: #1667c7;
+    --bs-primary-rgb: 22, 103, 199;
+    --bs-link-color: #1667c7;
+    --bs-link-color-rgb: 22, 103, 199;
+}
+
+body[data-bs-theme="dark"] {
+    --pl-navy: #06213d;
+    --pl-blue: #0f4f9a;
+    --pl-sky: #4aa6f0;
+    --pl-ice: #15304d;
+    --pl-bg: #0b1726;
+    --pl-card: #10233a;
+    --pl-line: #1f3a58;
+    --pl-text: #e6f0fa;
+    --pl-muted: #9db3c9;
+    --pl-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+    --text-custom-dark: #e6f0fa;
+}
+
+body {
+    font-family: 'IBM Plex Sans Thai', system-ui, -apple-system, 'Segoe UI', sans-serif;
+    color: var(--pl-text);
+    background:
+        radial-gradient(circle at 92% 70px, rgba(255, 255, 255, 0.13) 0 110px, transparent 111px),
+        radial-gradient(circle at 6% 210px, rgba(255, 255, 255, 0.08) 0 70px, transparent 71px),
+        linear-gradient(160deg, var(--pl-navy) 0%, var(--pl-blue) 70%, var(--pl-sky) 100%) top / 100% var(--pl-band) no-repeat,
+        var(--pl-bg);
+    background-color: var(--pl-bg);
+}
+
+/* ---------- แถบนำทาง ---------- */
+.navbar.bg-light {
+    background: rgba(255, 255, 255, 0.94) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--pl-line);
+    box-shadow: 0 2px 12px rgba(10, 58, 104, 0.08) !important;
+}
+
+body[data-bs-theme="dark"] .navbar.bg-light {
+    background: rgba(11, 23, 38, 0.92) !important;
+}
+
+.navbar-brand {
+    font-weight: 700;
+    letter-spacing: 0.2px;
+}
+
+.navbar-nav .nav-link {
+    border-radius: 10px;
+    font-weight: 500;
+}
+
+.navbar-nav .nav-link:hover {
+    background: var(--pl-ice);
+    color: var(--pl-blue);
+}
+
+.btn-logout {
+    border-radius: 999px;
+}
+
+/* ปุ่ม "กลับหน้าหลัก" อยู่บนแถบน้ำเงิน → ปุ่มโปร่งสีขาว */
+.backhome.btn-outline-danger,
+.outside-backhome.btn-outline-danger {
+    background: rgba(255, 255, 255, 0.14);
+    border: 1px solid rgba(255, 255, 255, 0.55);
+    color: #fff;
+    margin-bottom: 0.75rem;
+}
+
+.backhome.btn-outline-danger:hover,
+.outside-backhome.btn-outline-danger:hover {
+    background: rgba(255, 255, 255, 0.26);
+    color: #fff;
+}
+
+/* หน้าเข้าสู่ระบบเต็มจอ (body เว้นบน 40px ไว้ให้แถบนำทาง) */
+main.login#login {
+    margin-top: -40px;
+}
+
+/* ---------- ชื่อหน้า = fieldset ชั้นนอก (อยู่บนแถบน้ำเงิน) ---------- */
+main > .container > .row > fieldset {
+    border: 0 !important;
+    box-shadow: none !important;
+    background: transparent;
+    padding-left: 0.25rem !important;
+    padding-right: 0.25rem !important;
+    padding-top: 0.5rem !important;
+}
+
+main > .container > .row > fieldset > legend {
+    color: #fff;
+    font-size: 1.6rem;
+    font-weight: 700;
+    padding: 0 0.25rem !important;
+    margin-bottom: 1rem;
+    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
+}
+
+/* ---------- การ์ดหัวข้อในฟอร์ม = fieldset ชั้นใน ---------- */
+main fieldset fieldset {
+    background: var(--pl-card);
+    border: 1px solid var(--pl-line) !important;
+    border-radius: 20px !important;
+    box-shadow: var(--pl-shadow) !important;
+}
+
+main fieldset fieldset > legend {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #fff;
+    background: linear-gradient(135deg, var(--pl-blue), var(--pl-sky));
+    border-radius: 999px;
+    padding: 0.25rem 0.95rem !important;
+    box-shadow: 0 4px 10px rgba(22, 103, 199, 0.25);
+}
+
+/* ---------- ช่องกรอก ---------- */
+.form-control,
+.form-select,
+.input-group-text {
+    border-radius: 12px;
+    border-color: var(--pl-line);
+}
+
+.form-control,
+.form-select {
+    background-color: #fbfdff;
+}
+
+body[data-bs-theme="dark"] .form-control,
+body[data-bs-theme="dark"] .form-select {
+    background-color: #0d1d30;
+}
+
+.input-group > .input-group-text {
+    background: var(--pl-ice);
+    color: var(--pl-blue);
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: var(--pl-sky);
+    box-shadow: 0 0 0 0.2rem rgba(58, 155, 232, 0.2);
+}
+
+.form-floating > label {
+    color: var(--pl-muted);
+}
+
+/* ---------- ปุ่ม ---------- */
+.btn {
+    border-radius: 12px;
+    font-weight: 600;
+}
+
+.btn-primary,
+.btn-warning {
+    background: linear-gradient(135deg, var(--pl-blue), var(--pl-sky));
+    border: 0;
+    color: #fff;
+}
+
+.btn-primary:hover,
+.btn-warning:hover,
+.btn-primary:focus,
+.btn-warning:focus {
+    background: linear-gradient(135deg, var(--pl-navy), var(--pl-blue));
+    color: #fff;
+}
+
+.btn-outline-primary {
+    border-color: var(--pl-line);
+    color: var(--pl-navy);
+    background: var(--pl-card);
+}
+
+body[data-bs-theme="dark"] .btn-outline-primary {
+    color: var(--pl-text);
+}
+
+.btn-outline-primary:hover {
+    background: var(--pl-ice);
+    border-color: var(--pl-sky);
+    color: var(--pl-blue);
+}
+
+.btn-check:checked + .btn-outline-primary,
+.btn-outline-primary.active {
+    background: linear-gradient(135deg, var(--pl-blue), var(--pl-sky));
+    border-color: transparent;
+    color: #fff;
+    box-shadow: 0 4px 10px rgba(22, 103, 199, 0.25);
+}
+
+/* ---------- การ์ดบ้าน / การ์ดรายการ ---------- */
+main .card {
+    border: 1px solid var(--pl-line);
+    border-radius: 20px;
+    box-shadow: var(--pl-shadow) !important;
+    background: var(--pl-card);
+    overflow: hidden;
+    transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.listpoolvilla .card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 10px 24px rgba(16, 60, 110, 0.13) !important;
+}
+
+.listpoolvilla .card-row img,
+.outside-card-icon {
+    border-radius: 14px !important;
+}
+
+.outside-card-icon {
+    background: var(--pl-ice);
+    color: var(--pl-blue);
+}
+
+.card-title {
+    color: var(--pl-navy);
+    margin-top: 0.6rem;
+}
+
+body[data-bs-theme="dark"] .card-title {
+    color: var(--pl-text);
+}
+
+/* ---------- หน้าเข้าสู่ระบบ ---------- */
+#login .bgss {
+    background:
+        radial-gradient(circle at 85% 15%, rgba(255, 255, 255, 0.14) 0 140px, transparent 141px),
+        radial-gradient(circle at 10% 85%, rgba(255, 255, 255, 0.09) 0 110px, transparent 111px),
+        linear-gradient(160deg, var(--pl-navy) 0%, var(--pl-blue) 65%, var(--pl-sky) 100%);
+}
+
+#login .overlay {
+    display: none;
+}
+
+#login .card {
+    background: var(--pl-card) !important;
+    border: 0;
+    border-radius: 24px;
+    box-shadow: 0 20px 50px rgba(5, 30, 60, 0.35) !important;
+    padding: 1.5rem !important;
+    margin: 0 16px;
+}
+
+#login .text-customs {
+    color: var(--pl-navy);
+}
+
+body[data-bs-theme="dark"] #login .text-customs {
+    color: var(--pl-text);
+}
+
+#login .logins {
+    min-height: 46px;
+}
+
+/* ---------- ป๊อปอัป SweetAlert ---------- */
+.swal2-popup {
+    border-radius: 22px !important;
+    font-family: inherit !important;
+}
+
+.swal2-styled.swal2-confirm {
+    background: linear-gradient(135deg, var(--pl-blue), var(--pl-sky)) !important;
+    border-radius: 12px !important;
+}
+
+.swal2-styled.swal2-cancel,
+.swal2-styled.swal2-deny {
+    border-radius: 12px !important;
+}
+
+/* ---------- ช่องที่ "วางข้อความ" เติมให้ (paste.js) ---------- */
+.paste-filled {
+    border-color: var(--pl-sky) !important;
+    box-shadow: 0 0 0 0.2rem rgba(58, 155, 232, 0.22) !important;
+    background-color: #f0f7ff !important;
+}
+
+body[data-bs-theme="dark"] .paste-filled {
+    background-color: #12304f !important;
+}
+
+.paste-need {
+    border-color: #f0a020 !important;
+    box-shadow: 0 0 0 0.2rem rgba(240, 160, 32, 0.22) !important;
+}
+
+.paste-bar {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+    background: var(--pl-card);
+    border: 1px dashed var(--pl-sky);
+    border-radius: 16px;
+    padding: 0.6rem 0.75rem;
+    margin-bottom: 1rem;
+    box-shadow: var(--pl-shadow);
+}
+
+.paste-bar .paste-hint {
+    font-size: 0.85rem;
+    color: var(--pl-muted);
+    line-height: 1.3;
+}
+
+.paste-bar .btn {
+    white-space: nowrap;
+}
