@@ -48,6 +48,8 @@
   // งานเอเจ้น = ช่องทางที่ไม่อยู่ในรายการช่องทางแอดมิน (ถ้ายังโหลดรายการไม่ได้ ใช้กติกาเดิม)
   function isAgent(ch) {
     ch = String(ch || '').trim();
+    // walkin.js: Walk in เลือกได้ว่าแอดมิน/เอเจ้น (14 พ.ย. 2569)
+    if (typeof window.pailayCommOverride === 'function') { var ov = window.pailayCommOverride(ch); if (ov === true || ov === false) return ov; }
     if (!state.own.length) return /^\s*agen/i.test(ch);
     return state.own.indexOf(ch) === -1;
   }
@@ -363,6 +365,7 @@
         if (!res || res.status !== 'success') return;
         state.editHasRow = !!res.found;
         if (res.found) {
+          if (typeof window.pailayCommLoaded === 'function') window.pailayCommLoaded(res); // walkin.js
           setStaff('pool', isAgent(res.channel) ? '' : (res.staff || NO_STAFF));
           field('pool', 'g').val(res.g === '' ? '' : res.g);
           field('pool', 'h').val(res.h === '' ? '' : res.h);
@@ -518,4 +521,5 @@
       ['pool', 'out'].forEach(function (k) { if (box(k).is(':visible')) syncChips(k); });
     }, 1000);
   });
+  window.pailayCommRefresh = function () { ['pool', 'out'].forEach(function (k) { try { refreshMode(k); } catch (e) { } }); }; // walkin.js
 })();
