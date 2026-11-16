@@ -43,7 +43,8 @@
     var PAGE =
         '<main class="groupform mt-5" style="display:none"><div class="container"><div class="row">' +
         '<button class="btn btn-outline-danger w-100 mb-2 g-back">กลับหน้ารายการบ้าน</button>' +
-        '<fieldset class="border rounded p-3 mb-3 shadow-sm row"><legend class="float-none w-auto px-3">ข้อมูลผู้เข้าพัก (ใบจองหลายหลัง)</legend>' +
+        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm"><legend class="float-none w-auto px-3">ใบจองหลายหลัง (2–4 หลัง)</legend>' +
+        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row"><legend class="float-none w-auto px-3">ข้อมูลผู้เข้าพัก</legend>' +
         '<div class="col-12 col-md-6">' + fl('g-name', 'ชื่อผู้จอง *') + '</div>' +
         '<div class="col-6 col-md-3">' + fl('g-tel', 'เบอร์ติดต่อ *', 'text', 'inputmode="tel" maxlength="16"') + '</div>' +
         '<div class="col-6 col-md-3">' + fl('g-tel2', 'เบอร์ติดต่อ 2', 'text', 'inputmode="tel" maxlength="16"') + '</div>' +
@@ -53,34 +54,34 @@
         '<div class="col-12 mt-1"><div class="form-check form-switch"><input class="form-check-input g-comp-on" type="checkbox"><label class="form-check-label">ลูกค้าเป็นบริษัท — ออกใบจองในนามบริษัท</label></div></div>' +
         '<div class="g-comp row g-1 mt-1" style="display:none">' +
         '<div class="col-12 col-md-8">' + fl('g-comp-name', 'ชื่อบริษัท *') + '</div><div class="col-12 col-md-4">' + fl('g-comp-branch', 'สาขา', 'text', 'value="สำนักงานใหญ่"') + '</div>' +
-        '<div class="col-12">' + fl('g-comp-addr', 'ที่อยู่บริษัท *') + '</div><div class="col-12 col-md-6">' + fl('g-comp-tax', 'เลขประจำตัวผู้เสียภาษี 13 หลัก *', 'text', 'inputmode="numeric" maxlength="17"') + '</div></div>' +
+        '<div class="col-12">' + fl('g-comp-addr', 'ที่อยู่บริษัท *') + '</div><div class="col-12 col-md-6">' + fl('g-comp-tax', 'เลขผู้เสียภาษี 13 หลัก *', 'text', 'inputmode="numeric" maxlength="17"') + '</div></div>' +
         '</fieldset>' +
         '<div class="g-houses"></div>' +
         '<button type="button" class="btn btn-outline-primary w-100 mb-3 g-add">+ เพิ่มบ้าน (สูงสุด 4 หลัง)</button>' +
-        '<fieldset class="border rounded p-3 mb-3 shadow-sm row"><legend class="float-none w-auto px-3">ราคาและบริการของกลุ่ม</legend>' +
+        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row"><legend class="float-none w-auto px-3">ราคาและบริการของกลุ่ม</legend>' +
         '<div class="col-12 mb-1"><div class="form-check form-switch"><input class="form-check-input g-pkg-on" type="checkbox"><label class="form-check-label">ราคาแพ็กเกจ (ใบจองแสดงราคารวมอย่างเดียว · ระบบแบ่งลงแต่ละหลังตามสัดส่วนราคาปกติ)</label></div></div>' +
-        '<div class="col-12 col-md-6 g-pkg" style="display:none">' + fl('g-pkg-total', 'ราคาแพ็กเกจรวม (ไม่รวมค่าประกัน) *', 'text', 'inputmode="decimal"') + '</div>' +
+        '<div class="col-12 col-md-6 g-pkg" style="display:none">' + fl('g-pkg-total', 'ราคาแพ็กเกจรวม *', 'text', 'inputmode="decimal"') + '</div>' +
         '<div class="col-12 mt-1 fw-semibold">บริการ / ของแถม</div>' +
         '<div class="col-12 mb-1"><div class="btn-group w-100" role="group"><input type="radio" class="btn-check" name="g-per" id="g-per-1" value="1" checked><label class="btn btn-outline-primary" for="g-per-1">ต่อหลัง (ทุกหลังได้เท่ากัน)</label>' +
         '<input type="radio" class="btn-check" name="g-per" id="g-per-0" value="0"><label class="btn btn-outline-primary" for="g-per-0">รวมทั้งกลุ่ม</label></div></div>' +
         '<div class="col-4">' + fl('g-ice', 'น้ำแข็ง (กระสอบ)', 'text', 'inputmode="numeric"') + '</div>' +
         '<div class="col-4">' + fl('g-water', 'น้ำดื่ม (แพ็ค)', 'text', 'inputmode="numeric"') + '</div>' +
         '<div class="col-4">' + fl('g-coal', 'ถ่านปิ้งย่าง (ถุง)', 'text', 'inputmode="numeric"') + '</div>' +
-        '<div class="col-12">' + fl('g-other', 'บริการอื่น เช่น บริการล้างจานฟรี 1 ครั้ง (09:30 น.) — คั่นหลายรายการด้วย ,') + '</div>' +
-        '<div class="col-12 col-md-8">' + fl('g-breakfast', 'แถมอาหารเช้า เช่น ข้าวต้มหมูทรงเครื่อง (ส่งไม่เกิน 08:30 น.)') + '</div>' +
-        '<div class="col-12 col-md-4">' + fl('g-mat', 'เสริมที่นอนปิกนิก (บาท/ท่าน)', 'text', 'inputmode="numeric" value="500"') + '</div>' +
-        '<div class="col-12"><div class="form-floating mb-1"><textarea class="form-control g-note" placeholder="หมายเหตุ" style="height:80px"></textarea><label>หมายเหตุพิเศษของกลุ่ม (ตัวแดงในใบจอง)</label></div></div>' +
+        '<div class="col-12">' + fl('g-other', 'บริการอื่น (คั่นด้วย ,)') + '<div class="small text-muted mb-1">เช่น บริการล้างจานฟรี 1 ครั้ง (09:30 น.)</div></div>' +
+        '<div class="col-12 col-md-8">' + fl('g-breakfast', 'แถมอาหารเช้า (ถ้ามี)') + '</div>' +
+        '<div class="col-12 col-md-4">' + fl('g-mat', 'ที่นอนปิกนิก บาท/ท่าน', 'text', 'inputmode="numeric" value="500"') + '</div>' +
+        '<div class="col-12"><div class="form-floating mb-1"><textarea class="form-control g-note" placeholder="หมายเหตุ" style="height:80px"></textarea><label>หมายเหตุพิเศษ (ตัวแดง)</label></div></div>' +
         '</fieldset>' +
-        '<fieldset class="border rounded p-3 mb-3 shadow-sm row"><legend class="float-none w-auto px-3">ตารางนายหน้า + ค่าคอม</legend>' +
-        '<div class="col-12">' + fl('g-cal', 'ข้อความลงตาราง (ใช้ทุกหลัง) *') + '</div>' +
+        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row"><legend class="float-none w-auto px-3">ตารางนายหน้า + ค่าคอม</legend>' +
+        '<div class="col-12">' + fl('g-cal', 'ข้อความลงตาราง *') + '</div>' +
         '<div class="col-12 g-mode" style="display:none"><div class="fw-semibold mb-1">Walk in — ปิดการขายโดย</div><div class="btn-group w-100 mb-1"><input type="radio" class="btn-check" name="g-mode" id="g-mode-a" value="admin"><label class="btn btn-outline-primary" for="g-mode-a">แอดมิน</label><input type="radio" class="btn-check" name="g-mode" id="g-mode-g" value="agent"><label class="btn btn-outline-primary" for="g-mode-g">เอเจ้น</label></div></div>' +
         '<div class="col-12 g-admin"><div class="fw-semibold mb-1">พนักงานปิดการขาย (สูงสุด 3 คน)</div><div class="g-staff d-flex flex-wrap gap-2 mb-1"></div>' +
         '<div class="row g-1"><div class="col-6"><div class="form-floating mb-1"><select class="form-select g-issuer"><option value="">เลือก</option></select><label>ผู้ออกใบจอง *</label></div></div>' +
-        '<div class="col-6">' + fl('g-h', 'ค่าคอมแอดมินรวม (H) *', 'text', 'inputmode="decimal"') + '</div></div></div>' +
-        '<div class="col-12 g-agent" style="display:none">' + fl('g-g', 'ค่าคอมเอเจ้นรวม (G) * ไม่มีใส่ 0', 'text', 'inputmode="decimal"') + '</div>' +
+        '<div class="col-6">' + fl('g-h', 'ค่าคอมแอดมินรวม *', 'text', 'inputmode="decimal"') + '</div></div></div>' +
+        '<div class="col-12 g-agent" style="display:none">' + fl('g-g', 'ค่าคอมเอเจ้นรวม * (ไม่มีใส่ 0)', 'text', 'inputmode="decimal"') + '</div>' +
         '<div class="col-12 small text-muted">ค่าคอมรวมจะแบ่งลงแต่ละหลังตามสัดส่วนราคา</div>' +
         '</fieldset>' +
-        '<fieldset class="border rounded p-3 mb-3 shadow-sm row"><legend class="float-none w-auto px-3">ชำระมัดจำ (ก้อนเดียว)</legend>' +
+        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row"><legend class="float-none w-auto px-3">ชำระมัดจำ (ก้อนเดียว)</legend>' +
         '<div class="col-12 mb-1"><div class="btn-group w-100"><input type="radio" class="btn-check" name="g-pay" id="g-pay-1" value="เงินสด"><label class="btn btn-outline-primary" for="g-pay-1">เงินสด</label>' +
         '<input type="radio" class="btn-check" name="g-pay" id="g-pay-2" value="โอนจ่าย" checked><label class="btn btn-outline-primary" for="g-pay-2">โอนจ่าย</label></div></div>' +
         '<div class="col-6">' + fl('g-paydate', 'วันที่รับเงิน *', 'date') + '</div>' +
@@ -91,11 +92,11 @@
         '<div class="col-12 mt-2"><div class="g-sum p-2 rounded" style="background:rgba(13,110,253,.06)"></div></div>' +
         '</fieldset>' +
         '<button type="button" class="btn btn-primary w-100 mb-5 g-save">บันทึกใบจองหลายหลัง</button>' +
-        '</div></div></main>';
+        '</fieldset></div></div></main>';
 
     function houseCard(k) {
         var hopts = houses().map(function (h, i) { return '<option value="' + i + '">' + esc(h[0]) + '</option>'; }).join('');
-        return '<fieldset class="border rounded p-3 mb-3 shadow-sm row g-house" data-k="' + k + '"><legend class="float-none w-auto px-3">บ้านหลังที่ <span class="g-no"></span></legend>' +
+        return '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row g-house" data-k="' + k + '"><legend class="float-none w-auto px-3">บ้านหลังที่ <span class="g-no"></span></legend>' +
             '<div class="col-12 d-flex justify-content-end"><button type="button" class="btn btn-sm btn-outline-danger g-del">ลบหลังนี้</button></div>' +
             '<div class="col-12"><div class="form-floating mb-1"><select class="form-select h-house"><option value="">— เลือกบ้าน —</option>' + hopts + '</select><label>บ้าน *</label></div></div>' +
             '<div class="col-6 col-md-3">' + fl('h-in', 'วันเข้า *', 'date') + '</div><div class="col-6 col-md-3">' + fl('h-tin', 'เวลาเข้า', 'time', 'value="14:00"') + '</div>' +
@@ -103,12 +104,12 @@
             '<div class="col-12 h-nights row g-1 mx-0"></div>' +
             '<div class="col-6 col-md-3">' + fl('h-guests', 'ผู้เข้าพัก (ท่าน) *', 'text', 'inputmode="numeric"') + '</div>' +
             '<div class="col-6 col-md-3">' + fl('h-cap', 'พักได้ (ท่าน) *', 'text', 'inputmode="numeric"') + '</div>' +
-            '<div class="col-12 col-md-6">' + fl('h-rooms', 'ห้องนอน/ห้องน้ำ เช่น 5 ห้องนอน 6 ห้องน้ำ') + '</div>' +
+            '<div class="col-12 col-md-6">' + fl('h-rooms', 'ห้องนอน/ห้องน้ำ') + '</div>' +
             '<div class="col-6 col-md-3">' + fl('h-bedq', 'ที่นอนเสริม (ที่)', 'text', 'inputmode="numeric"') + '</div>' +
-            '<div class="col-6 col-md-3">' + fl('h-bedb', 'ค่าที่นอนเสริมรวม (บาท)', 'text', 'inputmode="decimal"') + '</div>' +
-            '<div class="col-4 col-md-2">' + fl('h-pett', 'สัตว์เลี้ยง') + '</div><div class="col-4 col-md-2">' + fl('h-petq', 'จำนวน', 'text', 'inputmode="numeric"') + '</div><div class="col-4 col-md-2">' + fl('h-petb', 'ค่าสัตว์ (บาท)', 'text', 'inputmode="decimal"') + '</div>' +
+            '<div class="col-6 col-md-3">' + fl('h-bedb', 'ค่าที่นอนเสริม', 'text', 'inputmode="decimal"') + '</div>' +
+            '<div class="col-4 col-md-2">' + fl('h-pett', 'สัตว์เลี้ยง') + '</div><div class="col-4 col-md-2">' + fl('h-petq', 'จำนวน', 'text', 'inputmode="numeric"') + '</div><div class="col-4 col-md-2">' + fl('h-petb', 'ค่าสัตว์', 'text', 'inputmode="decimal"') + '</div>' +
             '<div class="col-6 col-md-3">' + fl('h-ins', 'ค่าประกัน (บาท) *', 'text', 'inputmode="decimal"') + '</div>' +
-            '<div class="col-12 col-md-9">' + fl('h-note', 'หมายเหตุใต้ชื่อบ้าน เช่น เปิด 4 ห้องนอน (ลูกค้าเลือกห้องได้ เตียงคู่)') + '</div>' +
+            '<div class="col-12 col-md-9">' + fl('h-note', 'หมายเหตุใต้ชื่อบ้าน') + '</div>' +
             '<div class="col-12 small h-sum text-end fw-semibold"></div>' +
             '</fieldset>';
     }
@@ -344,6 +345,7 @@
 
     $(document).ready(function () {
         $p = $(PAGE).appendTo('body');
+        $('<style>.groupform .form-floating>label{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.groupform .form-check-label{white-space:normal}</style>').appendTo('head');
         var $list = $('.listpoolvilla .cardContainer');
         if ($list.length) $list.before('<div class="col-12 mb-2"><button type="button" class="btn btn-outline-primary w-100 g-open"><i class="bi bi-houses me-1"></i>จองหลายหลัง (2–4 หลัง) — ใบจองรวมใบเดียว</button></div>');
         $(document).on('click', '.g-open', open);
