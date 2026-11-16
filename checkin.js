@@ -15,6 +15,10 @@
         '    <input class="form-control cs-money" data-type="cash" type="text" inputmode="decimal" placeholder="เงินสด"><label>เงินสด (บาท) — ไม่มีเว้นว่าง</label>' +
         '  </div></div>' +
         '  <div class="cs-transfer border rounded p-2 mb-1" data-n="1"></div>' +
+        '  <div class="cs-cardbox border rounded p-2 mb-1"><div class="small fw-bold mb-1">💳 บัตรเครดิต (รอยอดเข้า · บัญชีบริษัทกสิกร)</div>' +
+        '    <div class="mb-1"><div class="form-floating"><input class="form-control cs-money cs-card" data-type="card" type="text" inputmode="decimal" placeholder="ยอดบัตร"><label>ยอดที่จ่ายด้วยบัตร (บาท) — ไม่มีเว้นว่าง</label></div></div>' +
+        '    <div class="small mb-1 cs-cardfee"></div>' +
+        '    <div><div class="form-floating"><input class="form-control cs-cardslip" type="file" accept="image/*" placeholder="สลิป"><label>สลิปเครื่องรูดบัตร</label></div></div></div>' +
         '  <div class="cs-transfer border rounded p-2 mb-1" data-n="2" style="display:none"></div>' +
         '  <button type="button" class="btn btn-outline-primary w-100 mb-1 cs-add2"><i class="bi bi-plus-circle me-1"></i>เพิ่มบัญชีรับเงินที่ 2</button>' +
         '  <div class="alert alert-secondary py-2 mb-1 cs-sum"></div>' +
@@ -43,6 +47,8 @@
         var total = 0;
         $panel().find('.cs-money:visible').each(function () { total += num(this.value); });
         var exp = expected();
+        var ca = num($panel().find('.cs-card').val()), cf = window.pailayCard ? window.pailayCard.fee(ca) : 0;
+        $panel().find('.cs-cardfee').html(ca > 0 ? 'ค่าธรรมเนียม 3% = <b>' + fmt(cf) + '</b> บาท (ลูกค้าจ่ายเพิ่ม) · ยอดรูดรวม <b>' + fmt(ca + cf) + '</b>' : '');
         var ok = Math.abs(total - exp) < 0.01;
         $panel().find('.cs-sum')
             .toggleClass('alert-success', ok).toggleClass('alert-warning', !ok)
@@ -64,7 +70,7 @@
         $p.find('.cs-date').val('');
         $p.find('.cs-money').val('');
         $p.find('.cs-bank').val('');
-        $p.find('.cs-slip').val('');
+        $p.find('.cs-slip, .cs-cardslip').val('');
         $p.find('.cs-transfer[data-n="2"]').hide();
         $p.find('.cs-add2').show();
         refreshSum();
@@ -113,6 +119,12 @@
             var bankName = $b.find('.cs-bank').val();
             if (!bankName) return Swal.fire({ icon: 'warning', title: 'กรุณาเลือกบัญชีรับเงินของยอดโอนบัญชีที่ ' + $b.data('n'), confirmButtonText: 'ตกลง' });
             parts.push({ type: 'โอนจ่าย', money: money, paylist: bankName, slip: await readFile($b.find('.cs-slip')[0]) });
+        }
+        var cardAmt = num($p.find('.cs-card').val());
+        if (cardAmt > 0) {
+            var cs = $p.find('.cs-cardslip')[0];
+            if (!(cs.files && cs.files.length)) return Swal.fire({ icon: 'warning', title: 'กรุณาแนบสลิปเครื่องรูดบัตร', confirmButtonText: 'ตกลง' });
+            parts.push({ type: window.pailayCard.MARK, money: cardAmt, slip: await readFile(cs) });
         }
         if (!parts.length) return Swal.fire({ icon: 'warning', title: 'กรุณาใส่ยอดเงินอย่างน้อย 1 ช่องทาง', confirmButtonText: 'ตกลง' });
 

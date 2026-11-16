@@ -70,6 +70,10 @@
         '<div class="col-12">' + fl('g-other', 'บริการอื่น (คั่นด้วย ,)') + '<div class="small text-muted mb-1">เช่น บริการล้างจานฟรี 1 ครั้ง (09:30 น.)</div></div>' +
         '<div class="col-12 col-md-8">' + fl('g-breakfast', 'แถมอาหารเช้า (ถ้ามี)') + '</div>' +
         '<div class="col-12 col-md-4">' + fl('g-mat', 'ที่นอนปิกนิก บาท/ท่าน', 'text', 'inputmode="numeric" value="500"') + '</div>' +
+        '<div class="col-12 fw-semibold mt-1">VAT 7% (ฐาน = ค่าที่พัก ไม่รวมค่าประกัน)</div>' +
+        '<div class="col-12 mb-1"><div class="btn-group w-100 flex-wrap"><input type="radio" class="btn-check" name="g-vat" id="g-vat-n" value="none" checked><label class="btn btn-sm btn-outline-primary" for="g-vat-n">ไม่มี VAT</label>' +
+        '<input type="radio" class="btn-check" name="g-vat" id="g-vat-e" value="excl"><label class="btn btn-sm btn-outline-primary" for="g-vat-e">ราคายังไม่รวม VAT (+7%)</label>' +
+        '<input type="radio" class="btn-check" name="g-vat" id="g-vat-i" value="incl"><label class="btn btn-sm btn-outline-primary" for="g-vat-i">ราคารวม VAT แล้ว</label></div></div>' +
         '<div class="col-12"><div class="form-floating mb-1"><textarea class="form-control g-note" placeholder="หมายเหตุ" style="height:80px"></textarea><label>หมายเหตุพิเศษ (ตัวแดง)</label></div></div>' +
         '</fieldset>' +
         '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row"><legend class="float-none w-auto px-3">ตารางนายหน้า + ค่าคอม</legend>' +
@@ -83,7 +87,9 @@
         '</fieldset>' +
         '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row"><legend class="float-none w-auto px-3">ชำระมัดจำ (ก้อนเดียว)</legend>' +
         '<div class="col-12 mb-1"><div class="btn-group w-100"><input type="radio" class="btn-check" name="g-pay" id="g-pay-1" value="เงินสด"><label class="btn btn-outline-primary" for="g-pay-1">เงินสด</label>' +
-        '<input type="radio" class="btn-check" name="g-pay" id="g-pay-2" value="โอนจ่าย" checked><label class="btn btn-outline-primary" for="g-pay-2">โอนจ่าย</label></div></div>' +
+        '<input type="radio" class="btn-check" name="g-pay" id="g-pay-2" value="โอนจ่าย" checked><label class="btn btn-outline-primary" for="g-pay-2">โอนจ่าย</label>' +
+        '<input type="radio" class="btn-check" name="g-pay" id="g-pay-3" value="card"><label class="btn btn-outline-primary" for="g-pay-3">บัตรเครดิต</label></div></div>' +
+        '<div class="col-12 g-cardnote small mb-1" style="display:none"></div>' +
         '<div class="col-6">' + fl('g-paydate', 'วันที่รับเงิน *', 'date') + '</div>' +
         '<div class="col-6">' + fl('g-deposit', 'ยอดมัดจำรวม *', 'text', 'inputmode="decimal"') + '</div>' +
         '<div class="col-12 g-bankwrap"><div class="form-floating mb-1"><select class="form-select g-bank"><option value="">เลือกบัญชี</option></select><label>รับเงินผ่านบัญชี *</label></div>' +
@@ -170,8 +176,10 @@
                 h.nights = ns; h.room = roomPart; h.price = alloc[i];
             });
         }
-        hs.forEach(function (h) { h.totalall = h.price + h.ins; });
-        return { hs: hs, total: hs.reduce(function (a, h) { return a + h.price; }, 0), ins: hs.reduce(function (a, h) { return a + h.ins; }, 0) };
+        var vm = $p.find('input[name=g-vat]:checked').val() || 'none';
+        hs.forEach(function (h) { h.vat = window.pailayVat ? window.pailayVat.calc(vm, h.price) : 0; h.vatMode = vm; h.totalall = h.price + (vm === 'excl' ? h.vat : 0) + h.ins; });
+        var vatSum = hs.reduce(function (a, h) { return a + h.vat; }, 0);
+        return { hs: hs, vatMode: vm, vat: vatSum, vatAdd: vm === 'excl' ? vatSum : 0, total: hs.reduce(function (a, h) { return a + h.price; }, 0), ins: hs.reduce(function (a, h) { return a + h.ins; }, 0) };
     }
     var allocDirty = false;
     function recalc() {
@@ -182,8 +190,10 @@
         var html = c.hs.map(function (h, i) { return '<div class="input-group input-group-sm mb-1"><span class="input-group-text" style="min-width:55%">' + (i + 1) + '. ' + esc(h.full || 'ยังไม่เลือกบ้าน') + '</span><input class="form-control g-al text-end" inputmode="decimal" value="' + (allocDirty && cur[i] !== undefined ? cur[i] : def[i]) + '"></div>'; }).join('');
         $a.html(html);
         var al = $a.find('.g-al').map(function () { return num(this.value); }).get(), sumAl = al.reduce(function (a, b) { return a + b; }, 0);
-        $p.find('.g-sum').html('ราคารวม <b>' + money(c.total) + '</b> · มัดจำ <b>' + money(dep) + '</b> · จ่ายวันเข้าพัก <b>' + money(c.total - dep) + '</b> · ค่าประกันรวม ' + c.hs.length + ' หลัง <b>' + money(c.ins) + '</b><br>' +
-            'ราคาจ่ายวันเข้าพักรวมทั้งหมด <b class="fs-5">' + money(c.total - dep + c.ins) + '</b>' + (Math.abs(sumAl - dep) > 0.01 ? '<br><span class="text-danger">⚠️ ผลรวมที่แบ่ง ' + money(sumAl) + ' ไม่เท่ามัดจำ ' + money(dep) + '</span>' : ''));
+        var cardOn = $p.find('input[name=g-pay]:checked').val() === 'card';
+        $p.find('.g-cardnote').toggle(cardOn).html(cardOn ? '💳 ค่าธรรมเนียมบัตร 3% = <b>' + money(window.pailayCard ? window.pailayCard.fee(dep) : 0) + '</b> บาท (ลูกค้าจ่ายเพิ่ม) · ยอดรูดรวม <b>' + money(dep + (window.pailayCard ? window.pailayCard.fee(dep) : 0)) + '</b> · ยอดเข้าบัญชีบริษัทกสิกร' : '');
+        $p.find('.g-sum').html('ราคารวม <b>' + money(c.total) + '</b>' + (c.vat ? ' · ' + (c.vatMode === 'incl' ? '(รวม VAT 7% แล้ว ' : 'VAT 7% <b>') + money(c.vat) + (c.vatMode === 'incl' ? ')' : '</b>') : '') + ' · มัดจำ <b>' + money(dep) + '</b> · จ่ายวันเข้าพัก <b>' + money(c.total + c.vatAdd - dep) + '</b> · ค่าประกันรวม ' + c.hs.length + ' หลัง <b>' + money(c.ins) + '</b><br>' +
+            'ราคาจ่ายวันเข้าพักรวมทั้งหมด <b class="fs-5">' + money(c.total + c.vatAdd - dep + c.ins) + '</b>' + (Math.abs(sumAl - dep) > 0.01 ? '<br><span class="text-danger">⚠️ ผลรวมที่แบ่ง ' + money(sumAl) + ' ไม่เท่ามัดจำ ' + money(dep) + '</span>' : ''));
         return c;
     }
 
@@ -257,9 +267,10 @@
             if (!$p.find('.g-bank').val()) return 'กรุณาเลือกบัญชีรับเงิน';
             if (!($p.find('.g-slip')[0].files || []).length) return 'กรุณาแนบสลิปโอนเงิน';
         }
+        if (pay === 'card' && !($p.find('.g-slip')[0].files || []).length) return 'กรุณาแนบสลิปเครื่องรูดบัตร';
         var al = $p.find('.g-al').map(function () { return num(this.value); }).get();
         if (Math.abs(al.reduce(function (a, b) { return a + b; }, 0) - dep) > 0.01) return 'ผลรวมมัดจำที่แบ่งลงแต่ละหลังต้องเท่ากับยอดมัดจำรวม';
-        if (dep > c.total + c.ins) return 'มัดจำมากกว่ายอดรวมทั้งหมด';
+        if (dep > c.total + c.vatAdd + c.ins) return 'มัดจำมากกว่ายอดรวมทั้งหมด';
         return '';
     }
 
@@ -284,12 +295,12 @@
                 bookinguser: ch, bookingnote: 'ใบจองหลายหลัง ' + c.hs.length + ' หลัง', timestart: h.din, timeend: h.dout, starttime: h.tin, endtime: h.tout, timevalue: String(h.nights.length),
                 quser: String(h.guests), qroom: (h.rooms.match(/\d+/) || [''])[0], qbed: h.bedq ? String(h.bedq) : '', tfood: '', qfood: '', tanimal: h.pett, qanimal: h.petq ? String(h.petq) : '',
                 totalroom: String(h.room), totalfood: '0', totalbed: String(h.bedb), totalanimal: String(h.petb), totalhouse: String(h.ins), totalall: String(h.totalall),
-                paydate: $p.find('.g-paydate').val(), paytotal: String(al[i]), overdue: String(Math.round((h.totalall - al[i]) * 100) / 100), paylist: pay === 'โอนจ่าย' ? $p.find('.g-bank').val() : '',
+                paydate: $p.find('.g-paydate').val(), paytotal: String(al[i]), overdue: String(Math.round((h.totalall - al[i]) * 100) / 100), paylist: pay === 'โอนจ่าย' ? $p.find('.g-bank').val() : (pay === 'card' ? window.pailayCard.ACC : ''), vat_mode: h.vatMode, vat_base: String(h.price), vat_amount: String(h.vat),
                 note: '', pdfedti1: String(h.cap), pdfedti2: String(num($p.find('.g-mat').val()) || 500), deposit2: 'ไม่แบ่งมัดจำ',
                 comm_enabled: '1', comm_staff: ag ? '' : staff, comm_g: ag ? String(gSplit[i]) : '', comm_h: ag ? '' : String(hSplit[i] || 0), comm_issuer: ag ? '' : ($p.find('.g-issuer').val() || ''),
                 cal_enabled: '1', cal_text: String($p.find('.g-cal').val()).trim(), g_rownote: h.note, g_rooms: h.rooms
             };
-            if (pay === 'เงินสด') f.pay_1 = 'เงินสด'; else f.pay_2 = 'โอนจ่าย';
+            if (pay === 'เงินสด') f.pay_1 = 'เงินสด'; else f.pay_2 = pay === 'card' ? window.pailayCard.MARK : 'โอนจ่าย';
             if (isWalkin(ch)) f.comm_mode = ag ? 'agent' : 'admin';
             h.nights.forEach(function (v, k) { f['night_' + (k + 1)] = String(v); });
             if (per || i === 0) free.forEach(function (x) { if (x[1] > 0) { f['free_' + x[3]] = x[0]; f['free_price_' + x[3]] = String(x[1]); } }); // ของแถมลงใบจองแต่ละหลัง (แม่บ้านเห็น) · รวมทั้งกลุ่ม = ลงหลังแรก
@@ -312,7 +323,7 @@
         }).then(function (r) {
             if (!r.isConfirmed) return;
             return fileData($p.find('.g-slip')[0]).then(function (slip) {
-                var payload = buildPayload(c, $p.find('input[name=g-pay]:checked').val() === 'โอนจ่าย' ? slip : '');
+                var payload = buildPayload(c, $p.find('input[name=g-pay]:checked').val() !== 'เงินสด' ? slip : '');
                 showhidepage('header');
                 return api('savegroup', { payload: JSON.stringify(payload) }).then(function (res) {
                     Swal.fire({ icon: res.status === 'success' ? 'success' : 'error', title: res.status === 'success' ? 'บันทึกเรียบร้อย' : 'บันทึกไม่สำเร็จ', text: res.message, confirmButtonText: 'ตกลง' }).then(function () {
@@ -328,7 +339,7 @@
         $p.find('input[type=text], input[type=date], textarea').val('');
         $p.find('.g-mat').val('500'); $p.find('.g-comp-branch').val('สำนักงานใหญ่');
         $p.find('input[type=checkbox]').prop('checked', false); $p.find('.g-comp, .g-pkg').hide();
-        $p.find('.g-slip').val(''); $p.find('#g-pay-2, #g-per-1').prop('checked', true);
+        $p.find('.g-slip').val(''); $p.find('#g-pay-2, #g-per-1, #g-vat-n').prop('checked', true); $p.find('.g-bank').closest('.form-floating').show(); $p.find('.g-bankwrap').show();
         $p.find('.g-houses').empty(); allocDirty = false;
         addHouse(false); addHouse();
         $p.find('.g-paydate').val(today());
@@ -369,7 +380,8 @@
         $p.on('change', '.g-pkg-on', function () { $p.find('.g-pkg').toggle(this.checked); });
         $p.on('change', '.g-comp-on', function () { $p.find('.g-comp').toggle(this.checked); });
         $p.on('change', '.g-channel, input[name=g-mode]', syncComm);
-        $p.on('change', 'input[name=g-pay]', function () { $p.find('.g-bankwrap').toggle(this.value === 'โอนจ่าย'); });
+        $p.on('change', 'input[name=g-pay]', function () { $p.find('.g-bankwrap').toggle(this.value !== 'เงินสด'); $p.find('.g-bank').closest('.form-floating').toggle(this.value === 'โอนจ่าย'); recalc(); });
+        $p.on('change', 'input[name=g-vat]', recalc);
         $p.on('input', '.g-name', function () { var $cal = $p.find('.g-cal'); if (!$cal.data('touched')) $cal.val('จอง K.' + String(this.value).replace(/^คุณ\s*/, '').trim()); });
         $p.on('input', '.g-cal', function () { $(this).data('touched', 1); });
         $p.on('input', '.g-tel, .g-tel2', function () { var d = this.value.replace(/\D/g, '').slice(0, 10); if (d !== this.value) this.value = d; });

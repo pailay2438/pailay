@@ -106,7 +106,9 @@
                 '<select class="form-select mb-2 pp-cat"></select>' +
                 '<div class="small text-start text-muted mb-2 pp-hint"></div>' +
                 '<div class="btn-group w-100 mb-2"><input type="radio" class="btn-check" name="pp-pay" id="pp-pay-1" value="เงินสด"><label class="btn btn-outline-primary" for="pp-pay-1">เงินสด</label>' +
-                '<input type="radio" class="btn-check" name="pp-pay" id="pp-pay-2" value="โอนจ่าย" checked><label class="btn btn-outline-primary" for="pp-pay-2">โอนจ่าย</label></div>' +
+                '<input type="radio" class="btn-check" name="pp-pay" id="pp-pay-2" value="โอนจ่าย" checked><label class="btn btn-outline-primary" for="pp-pay-2">โอนจ่าย</label>' +
+                '<input type="radio" class="btn-check" name="pp-pay" id="pp-pay-3" value="card"><label class="btn btn-outline-primary" for="pp-pay-3">บัตรเครดิต</label></div>' +
+                '<div class="small text-start mb-2 pp-cardnote" style="display:none"></div>' +
                 '<select class="form-select mb-2 pp-bank"><option value="">เลือกบัญชีรับเงิน</option></select>' +
                 '<input type="date" class="form-control mb-2 pp-date">' +
                 '<input type="text" inputmode="decimal" class="form-control mb-2 pp-money" placeholder="ยอดเงิน (บาท)">' +
@@ -121,27 +123,30 @@
                 banks.forEach(function (x) { var o = document.createElement('option'); o.value = x; o.textContent = x; bs.appendChild(o); });
                 c.querySelector('.pp-date').value = today();
                 var sync = function () {
-                    var transfer = c.querySelector('#pp-pay-2').checked;
+                    var transfer = c.querySelector('#pp-pay-2').checked, card = c.querySelector('#pp-pay-3').checked;
                     bs.style.display = transfer ? '' : 'none';
-                    c.querySelector('.pp-sliplab').textContent = transfer ? 'สลิป *' : 'รูปเงินสด (ถ้ามี)';
+                    c.querySelector('.pp-sliplab').textContent = transfer ? 'สลิป *' : card ? 'สลิปเครื่องรูดบัตร *' : 'รูปเงินสด (ถ้ามี)';
+                    var cn = c.querySelector('.pp-cardnote'), m0 = num(c.querySelector('.pp-money').value), f0 = window.pailayCard ? window.pailayCard.fee(m0) : 0;
+                    cn.style.display = card ? '' : 'none';
+                    cn.innerHTML = card ? '💳 ค่าธรรมเนียม 3% = <b>' + money(f0) + '</b> บาท (ลูกค้าจ่ายเพิ่ม) · ยอดรูดรวม <b>' + money(m0 + f0) + '</b> · รอยอดเข้าบัญชีบริษัท' : '';
                     c.querySelector('.pp-hint').textContent = sel.value === PREPAY ? 'ยอดนี้จะหักออกจากยอดค้างจ่ายวันเข้าพัก · ออกใบจองใหม่ให้อัตโนมัติ' : 'ลงเป็นรายรับอย่างเดียว ไม่เปลี่ยนยอดค่าที่พัก';
                 };
-                c.addEventListener('change', sync); sync();
+                c.addEventListener('change', sync); c.addEventListener('input', sync); sync();
             },
             showCancelButton: true, confirmButtonText: 'บันทึก', cancelButtonText: 'ยกเลิก', reverseButtons: true,
             preConfirm: function () {
                 var c = Swal.getHtmlContainer();
-                var cat = c.querySelector('.pp-cat').value, pay = c.querySelector('#pp-pay-2').checked ? 'โอนจ่าย' : 'เงินสด';
+                var cat = c.querySelector('.pp-cat').value, pay = c.querySelector('#pp-pay-2').checked ? 'โอนจ่าย' : c.querySelector('#pp-pay-3').checked ? 'card' : 'เงินสด';
                 var m = num(c.querySelector('.pp-money').value), bk = c.querySelector('.pp-bank').value, d = c.querySelector('.pp-date').value;
                 var slipIn = c.querySelector('.pp-slip');
                 if (!(m > 0)) return Swal.showValidationMessage('กรุณาใส่ยอดเงิน');
                 if (!d) return Swal.showValidationMessage('กรุณาเลือกวันที่');
                 if (pay === 'โอนจ่าย' && !bk) return Swal.showValidationMessage('กรุณาเลือกบัญชีรับเงิน');
-                if (pay === 'โอนจ่าย' && !(slipIn.files && slipIn.files.length)) return Swal.showValidationMessage('กรุณาแนบสลิป');
+                if (pay !== 'เงินสด' && !(slipIn.files && slipIn.files.length)) return Swal.showValidationMessage(pay === 'card' ? 'กรุณาแนบสลิปเครื่องรูดบัตร' : 'กรุณาแนบสลิป');
                 if (cat === PREPAY && m > num(b[26]) - num(b[24]) + 0.001) return Swal.showValidationMessage('ยอดเกินค่าที่พักที่ค้าง (' + money(num(b[26]) - num(b[24])) + ' บาท ไม่รวมค่าประกัน)');
                 return readFile(slipIn).then(function (slip) {
-                    var o = { idlists: uid, money: String(m), paydate: d, paylist: pay === 'โอนจ่าย' ? bk : '', slip: slip, depositlist: cat, minusdeposit: '', addday: '', othermoney: '' };
-                    if (pay === 'เงินสด') o.pay_111 = 'เงินสด'; else o.pay_222 = 'โอนจ่าย';
+                    var o = { idlists: uid, money: String(m), paydate: d, paylist: pay === 'โอนจ่าย' ? bk : (pay === 'card' ? window.pailayCard.ACC : ''), slip: slip, depositlist: cat, minusdeposit: '', addday: '', othermoney: '' };
+                    if (pay === 'เงินสด') o.pay_111 = 'เงินสด'; else o.pay_222 = pay === 'card' ? window.pailayCard.MARK : 'โอนจ่าย';
                     if (cat === PREPAY) o.prepay = '1';
                     return o;
                 });
