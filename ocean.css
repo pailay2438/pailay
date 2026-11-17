@@ -223,3 +223,31 @@ body[data-bs-theme="dark"] .plc-chip.d, body[data-bs-theme="dark"] .plh-tag.d { 
 .plc .plc-more .btn.btn-outline-danger, .plc .plc-more .btn.btn-outline-danger i { color: var(--pl-bad) !important; }
 .plc.plc-nopri.plc-nosec .plc-tg { flex: 1 1 auto; max-width: none; }
 .plc.plc-nopri.plc-nosec .plc-tg .btn::after { content: ' เมนูเพิ่มเติม'; font-size: 13px; }
+
+/* ---------- ฟอร์มแบ่งขั้น (เฟส 3 · steps.js) ---------- */
+.pls-off { display: none !important; }
+.pls-steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; margin: 4px 0 6px; }
+.pls-st { border: 0; background: none; padding: 0; font: inherit; display: flex; flex-direction: column; align-items: center; gap: 4px; color: var(--pl-muted); font-size: 12px; position: relative; }
+.pls-st::before { content: ''; display: block; width: 100%; height: 5px; border-radius: 9px; background: var(--pl-line); margin-bottom: 4px; }
+.pls-st.done::before, .pls-st.on::before { background: var(--pl-blue); }
+.pls-st .pls-n { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; background: var(--pl-bg); border: 1.5px solid var(--pl-line); font-weight: 700; font-size: 12.5px; }
+.pls-st.on .pls-n { background: var(--pl-blue); border-color: var(--pl-blue); color: #fff; }
+.pls-st.done .pls-n { background: var(--pl-ice); border-color: var(--pl-blue); color: var(--pl-blue); }
+.pls-st.on { color: var(--pl-blue); font-weight: 600; }
+.pls-hint { color: var(--pl-muted); text-align: center; margin-bottom: 10px; }
+#formpoolvilla.pls-on .savepool { display: none !important; }
+.pls-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 1025; display: flex; align-items: center; gap: 10px; padding: 10px 16px calc(10px + env(safe-area-inset-bottom)); background: var(--pl-card, #fff); border-top: 1px solid var(--pl-line); box-shadow: 0 -6px 18px rgba(7, 90, 120, .08); color: var(--pl-text); }
+.pls-sum { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.pls-sum small { color: var(--pl-muted); font-size: 11.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.pls-sum b { font-size: 19px; }
+.pls-prev { width: 46px; height: 46px; border: 1px solid var(--pl-line) !important; color: var(--pl-muted) !important; background: var(--pl-card, #fff) !important; }
+.pls-next { height: 46px; padding: 0 20px; background: var(--pl-blue) !important; color: #fff !important; border: 0 !important; font-weight: 600; white-space: nowrap; }
+main.formpoolvilla.pls-on { padding-bottom: 90px; }
+@media (max-width: 991.98px) {
+    body.pl-in .pls-bar { bottom: calc(68px + env(safe-area-inset-bottom)); padding-bottom: 10px; }
+    body.pl-in main.formpoolvilla.pls-on { padding-bottom: 96px; }
+    .pls-st .pls-t { font-size: 11px; text-align: center; line-height: 1.2; }
+}
+@media (min-width: 992px) { body.pl-in .pls-bar { left: var(--pl-side); padding-left: 28px; padding-right: 28px; } }
+.pls-steps { background: var(--pl-card, #fff); border: 1px solid var(--pl-line); border-radius: 16px; padding: 10px 10px 8px; box-shadow: var(--pl-shadow); margin-bottom: 0; }
+.pls-hint { background: var(--pl-card, #fff); border: 1px solid var(--pl-line); border-top: 0; border-radius: 0 0 16px 16px; margin: -8px 6px 12px; padding: 10px 0 4px; }
