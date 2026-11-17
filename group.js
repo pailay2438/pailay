@@ -27,8 +27,13 @@
         return new Promise(function (res, rej) { var f = input && input.files && input.files[0]; if (!f) return res(''); var r = new FileReader(); r.onload = function (e) { res(e.target.result); }; r.onerror = rej; r.readAsDataURL(f); });
     }
     // วันที่ถูกจองแล้ว (dayroom: [บ้าน, เริ่ม, สิ้นสุด]) — ช่วงคืนที่พัก [in, out)
+    function ymdOf(x) { var d = new Date(x); return isNaN(d) ? '' : d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
     function overlap(houseFull, din, dout) {
         var dr = (typeof dayroom !== 'undefined' && Array.isArray(dayroom)) ? dayroom : [];
+        if (EDIT) { // แก้ไขใบรวม: ไม่นับช่วงวันเดิมของบ้านในกลุ่มนี้เอง
+            var own = Object.keys(EDIT.byK).map(function (k) { return EDIT.byK[k].orig; });
+            dr = dr.filter(function (r) { return !own.some(function (o) { return o.house === r[0] && o.din === ymdOf(r[1]) && o.dout === ymdOf(r[2]); }); });
+        }
         var a = new Date(din + 'T00:00:00'), b = new Date(dout + 'T00:00:00');
         return dr.some(function (r) {
             if (r[0] !== houseFull) return false;
@@ -43,7 +48,7 @@
     var PAGE =
         '<main class="groupform mt-5" style="display:none"><div class="container"><div class="row">' +
         '<button class="btn btn-outline-danger w-100 mb-2 g-back">กลับหน้ารายการบ้าน</button>' +
-        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm"><legend class="float-none w-auto px-3">ใบจองหลายหลัง (2–4 หลัง)</legend>' +
+        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm"><legend class="float-none w-auto px-3 g-title">ใบจองหลายหลัง (2–4 หลัง)</legend><div class="g-editnote alert alert-warning py-2 small" style="display:none"></div>' +
         '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row"><legend class="float-none w-auto px-3">ข้อมูลผู้เข้าพัก</legend>' +
         '<div class="col-12 col-md-6">' + fl('g-name', 'ชื่อผู้จอง *') + '</div>' +
         '<div class="col-6 col-md-3">' + fl('g-tel', 'เบอร์ติดต่อ *', 'text', 'inputmode="tel" maxlength="16"') + '</div>' +
@@ -85,7 +90,8 @@
         '<div class="col-12 g-agent" style="display:none">' + fl('g-g', 'ค่าคอมเอเจ้นรวม * (ไม่มีใส่ 0)', 'text', 'inputmode="decimal"') + '</div>' +
         '<div class="col-12 small text-muted">ค่าคอมรวมจะแบ่งลงแต่ละหลังตามสัดส่วนราคา</div>' +
         '</fieldset>' +
-        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row"><legend class="float-none w-auto px-3">ชำระมัดจำ (ก้อนเดียว)</legend>' +
+        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row g-paidfs" style="display:none"><legend class="float-none w-auto px-3">ยอดที่ชำระแล้ว (ไม่เปลี่ยน)</legend><div class="col-12 g-paid"></div><div class="col-12 mt-2"><div class="g-sum2 p-2 rounded" style="background:rgba(13,110,253,.06)"></div></div></fieldset>' +
+        '<fieldset class="border rounded p-4 mb-4 me-1 ms-1 shadow-sm row g-payfs"><legend class="float-none w-auto px-3">ชำระมัดจำ (ก้อนเดียว)</legend>' +
         '<div class="col-12 mb-1"><div class="btn-group w-100"><input type="radio" class="btn-check" name="g-pay" id="g-pay-1" value="เงินสด"><label class="btn btn-outline-primary" for="g-pay-1">เงินสด</label>' +
         '<input type="radio" class="btn-check" name="g-pay" id="g-pay-2" value="โอนจ่าย" checked><label class="btn btn-outline-primary" for="g-pay-2">โอนจ่าย</label>' +
         '<input type="radio" class="btn-check" name="g-pay" id="g-pay-3" value="card"><label class="btn btn-outline-primary" for="g-pay-3">บัตรเครดิต</label></div></div>' +
@@ -121,11 +127,13 @@
     }
 
     var $p;
+    var EDIT = null; // แก้ไขใบรวม: { gid, byK: { cardKey: { uid, paid, row, orig } } }
+    var GROUPS = {}; // UID → GroupID (opt=grouplist)
     function cards() { return $p.find('.g-house'); }
     function renumber() {
         cards().each(function (i) { $(this).find('.g-no').text(i + 1); });
-        $p.find('.g-del').toggle(cards().length > MINH);
-        $p.find('.g-add').toggle(cards().length < MAXH);
+        $p.find('.g-del').toggle(!EDIT && cards().length > MINH);
+        $p.find('.g-add').toggle(!EDIT && cards().length < MAXH);
     }
     function drawNights($c) {
         var n = nightsBetween($c.find('.h-in').val(), $c.find('.h-out').val());
@@ -148,7 +156,7 @@
 
     /* ---------- คำนวณ ---------- */
     function houseData($c) {
-        var hi = $c.find('.h-house').val(), H = hi === '' ? null : houses()[+hi];
+        var hi = $c.find('.h-house').val(), H = hi === '' ? null : (hi === 'x' ? [$c.find('.h-house option:selected').text()] : houses()[+hi]);
         var nights = $c.find('.h-night').map(function () { return num(this.value); }).get();
         return {
             $c: $c, house: H, full: H ? H[0] : '', din: $c.find('.h-in').val(), dout: $c.find('.h-out').val(), tin: $c.find('.h-tin').val() || '14:00', tout: $c.find('.h-tout').val() || '11:00',
@@ -194,6 +202,11 @@
         $p.find('.g-cardnote').toggle(cardOn).html(cardOn ? '💳 ค่าธรรมเนียมบัตร 3% = <b>' + money(window.pailayCard ? window.pailayCard.fee(dep) : 0) + '</b> บาท (ลูกค้าจ่ายเพิ่ม) · ยอดรูดรวม <b>' + money(dep + (window.pailayCard ? window.pailayCard.fee(dep) : 0)) + '</b> · ยอดเข้าบัญชีบริษัทกสิกร' : '');
         $p.find('.g-sum').html('ราคารวม <b>' + money(c.total) + '</b>' + (c.vat ? ' · ' + (c.vatMode === 'incl' ? '(รวม VAT 7% แล้ว ' : 'VAT 7% <b>') + money(c.vat) + (c.vatMode === 'incl' ? ')' : '</b>') : '') + ' · มัดจำ <b>' + money(dep) + '</b> · จ่ายวันเข้าพัก <b>' + money(c.total + c.vatAdd - dep) + '</b> · ค่าประกันรวม ' + c.hs.length + ' หลัง <b>' + money(c.ins) + '</b><br>' +
             'ราคาจ่ายวันเข้าพักรวมทั้งหมด <b class="fs-5">' + money(c.total + c.vatAdd - dep + c.ins) + '</b>' + (Math.abs(sumAl - dep) > 0.01 ? '<br><span class="text-danger">⚠️ ผลรวมที่แบ่ง ' + money(sumAl) + ' ไม่เท่ามัดจำ ' + money(dep) + '</span>' : ''));
+        if (EDIT) {
+            var paidSum = 0;
+            $p.find('.g-paid').html(c.hs.map(function (h, i) { var e = EDIT.byK[h.$c.data('k')] || {}; paidSum += e.paid || 0; return '<div class="d-flex justify-content-between small"><span>' + (i + 1) + '. ' + esc(h.full) + '</span><b>' + money(e.paid || 0) + '</b></div>'; }).join(''));
+            $p.find('.g-sum2').html('ราคารวม <b>' + money(c.total) + '</b>' + (c.vat ? ' · VAT 7% ' + money(c.vat) : '') + ' · ชำระแล้ว <b>' + money(paidSum) + '</b> · ค่าประกันรวม <b>' + money(c.ins) + '</b><br>ราคาจ่ายวันเข้าพักรวมทั้งหมด <b class="fs-5">' + money(c.total + c.vatAdd + c.ins - paidSum) + '</b>' + (c.total + c.vatAdd + c.ins - paidSum < 0 ? '<br><span class="text-danger">⚠️ ยอดใหม่น้อยกว่าที่ชำระแล้ว</span>' : ''));
+        }
         return c;
     }
 
@@ -260,6 +273,7 @@
             if (!$p.find('.g-issuer').val()) return 'กรุณาเลือกผู้ออกใบจอง';
             if (st.indexOf('-') === -1 && String($p.find('.g-h').val()).trim() === '') return 'กรุณากรอกค่าคอมแอดมิน (H)';
         }
+        if (EDIT) return '';
         var dep = num($p.find('.g-deposit').val()), pay = $p.find('input[name=g-pay]:checked').val();
         if (!(dep > 0)) return 'กรุณาใส่ยอดมัดจำ';
         if (!$p.find('.g-paydate').val()) return 'กรุณาเลือกวันที่รับเงิน';
@@ -300,14 +314,18 @@
                 comm_enabled: '1', comm_staff: ag ? '' : staff, comm_g: ag ? String(gSplit[i]) : '', comm_h: ag ? '' : String(hSplit[i] || 0), comm_issuer: ag ? '' : ($p.find('.g-issuer').val() || ''),
                 cal_enabled: '1', cal_text: String($p.find('.g-cal').val()).trim(), g_rownote: h.note, g_rooms: h.rooms
             };
-            if (pay === 'เงินสด') f.pay_1 = 'เงินสด'; else f.pay_2 = pay === 'card' ? window.pailayCard.MARK : 'โอนจ่าย';
+            var E = EDIT && EDIT.byK[h.$c.data('k')];
+            if (E) { // แก้ไขใบรวม: ยอดที่ชำระแล้วคงเดิม · ค่าชำระอีก = ยอดใหม่ − ที่ชำระแล้ว
+                f.houseedit = E.uid; f.house_from = E.orig.house; f.bookingnote = E.row[7] || f.bookingnote; f.note = E.row[27] || '';
+                f.paytotal = String(E.paid); f.overdue = String(Math.round((h.totalall - E.paid) * 100) / 100); f.paydate = ''; f.paylist = '';
+            } else if (pay === 'เงินสด') f.pay_1 = 'เงินสด'; else f.pay_2 = pay === 'card' ? window.pailayCard.MARK : 'โอนจ่าย';
             if (isWalkin(ch)) f.comm_mode = ag ? 'agent' : 'admin';
             h.nights.forEach(function (v, k) { f['night_' + (k + 1)] = String(v); });
             if (per || i === 0) free.forEach(function (x) { if (x[1] > 0) { f['free_' + x[3]] = x[0]; f['free_price_' + x[3]] = String(x[1]); } }); // ของแถมลงใบจองแต่ละหลัง (แม่บ้านเห็น) · รวมทั้งกลุ่ม = ลงหลังแรก
             return Object.assign(f, comp);
         });
         return {
-            houses: houses, slip: slip,
+            gid: EDIT ? EDIT.gid : undefined, houses: houses, slip: slip,
             extras: { packageTotal: $p.find('.g-pkg-on').is(':checked') ? num($p.find('.g-pkg-total').val()) : 0, servicesPer: per, free: freeTxt, breakfast: String($p.find('.g-breakfast').val() || '').trim(), groupNote: String($p.find('.g-note').val() || '').trim() }
         };
     }
@@ -315,6 +333,7 @@
     function save() {
         var c = recalc(), err = validate(c);
         if (err) return Swal.fire({ icon: 'warning', title: err, confirmButtonText: 'ตกลง' });
+        if (EDIT) return saveEdit(c);
         var dep = num($p.find('.g-deposit').val());
         Swal.fire({
             icon: 'question', title: 'บันทึกใบจองหลายหลัง ' + c.hs.length + ' หลัง?',
@@ -335,7 +354,33 @@
         });
     }
 
+    function saveEdit(c) {
+        Swal.fire({
+            icon: 'question', title: 'บันทึกการแก้ไขใบรวม ' + c.hs.length + ' หลัง?',
+            html: c.hs.map(function (h, i) { return (i + 1) + '. ' + esc(h.full) + ' · ' + esc(h.din) + ' → ' + esc(h.dout) + ' · ' + money(h.price); }).join('<br>') + '<br><br>ระบบจะออก PDF รวมใหม่ และเรียกคืนการ์ดใบจองรวมเดิมในกลุ่ม Lark',
+            showCancelButton: true, confirmButtonText: 'บันทึก', cancelButtonText: 'กลับไปแก้', reverseButtons: true
+        }).then(function (r) {
+            if (!r.isConfirmed) return;
+            var payload = buildPayload(c, '');
+            showhidepage('header');
+            return api('savegroupedit', { payload: JSON.stringify(payload) }).then(function (res) {
+                Swal.fire({ icon: res.status === 'success' ? 'success' : 'error', title: res.status === 'success' ? 'บันทึกเรียบร้อย' : 'บันทึกไม่สำเร็จ', text: res.message, confirmButtonText: 'ตกลง' }).then(function () {
+                    if (res.status === 'success') { reset(); showhidepage('.listpoolvilla,nav'); if (typeof getdata === 'function') getdata(); }
+                    else showhidepage('.groupform,nav');
+                });
+            }).catch(function (e) { console.error(e); showhidepage('.groupform,nav'); Swal.fire({ icon: 'error', title: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', confirmButtonText: 'ตกลง' }); });
+        });
+    }
+
+    function setEditUi(on) {
+        $p.find('.g-title').text(on ? 'แก้ไขใบจองหลายหลัง (ใบรวม)' : 'ใบจองหลายหลัง (2–4 หลัง)');
+        $p.find('.g-editnote').toggle(!!on).html(on ? 'แก้ไขข้อมูลทุกหลังในใบรวมได้ที่นี่ (เปลี่ยนบ้าน/วัน/ราคา/ผู้พัก/บริการ/ค่าคอม) · ยอดที่ชำระแล้วไม่เปลี่ยน · <b>ลดหลัง</b> = กดยกเลิกใบจองของหลังนั้น (ระบบออก PDF รวมใหม่ให้)' : '');
+        $p.find('.g-payfs').toggle(!on); $p.find('.g-paidfs').toggle(!!on);
+        $p.find('.g-save').text(on ? 'บันทึกการแก้ไขใบรวม' : 'บันทึกใบจองหลายหลัง');
+    }
+
     function reset() {
+        EDIT = null; setEditUi(false);
         $p.find('input[type=text], input[type=date], textarea').val('');
         $p.find('.g-mat').val('500'); $p.find('.g-comp-branch').val('สำนักงานใหญ่');
         $p.find('input[type=checkbox]').prop('checked', false); $p.find('.g-comp, .g-pkg').hide();
@@ -352,7 +397,68 @@
         showhidepage('.groupform,nav');
         window.scrollTo(0, 0);
     }
-    window.pailayGroup = { open: open, computed: function () { return computed(); }, buildPayload: function () { return buildPayload(recalc(), ''); }, validate: function () { return validate(recalc()); } };
+    /* ---------- แก้ไขใบรวม ---------- */
+    function loadGroups() { return api('grouplist').then(function (r) { if (r && r.status === 'success') GROUPS = r.map || {}; }).catch(function () { }); }
+    function hm(x) { var m = String(x || '').match(/(\d{4}-\d{2}-\d{2})(?:\s+(\d{1,2}:\d{2}))?/); return m ? { d: m[1], t: m[2] || '' } : { d: '', t: '' }; }
+    function fillEdit(d) {
+        reset(); EDIT = { gid: d.gid, byK: {} }; setEditUi(true);
+        var ex = d.extras || {}, b0 = d.houses[0].row;
+        $p.find('.g-houses').empty();
+        d.houses.forEach(function (H) {
+            var b = H.row, a = hm(b[8]), o = hm(b[9]);
+            var $c = $(houseCard('u' + H.uid)).appendTo($p.find('.g-houses'));
+            var hi = houses().map(function (x) { return x[0]; }).indexOf(b[1]);
+            if (hi === -1) { $c.find('.h-house').append($('<option>').val('x').text(b[1])); }
+            $c.find('.h-house').val(hi === -1 ? 'x' : String(hi));
+            $c.find('.h-in').val(a.d); $c.find('.h-tin').val(a.t || '14:00'); $c.find('.h-out').val(o.d); $c.find('.h-tout').val(o.t || '11:00');
+            drawNights($c);
+            var ns = String(b[11] || '').split('|'); $c.find('.h-night').each(function (i) { if (ns[i] !== undefined) this.value = ns[i]; });
+            $c.find('.h-guests').val(b[12]); $c.find('.h-cap').val(b[28]); $c.find('.h-rooms').val((ex.rooms && ex.rooms[H.uid]) || (num(b[13]) ? b[13] + ' ห้องนอน' : ''));
+            $c.find('.h-bedq').val(num(b[14]) || ''); $c.find('.h-bedb').val(num(b[21]) || ''); $c.find('.h-pett').val(b[17] && b[17] !== '-' ? b[17] : ''); $c.find('.h-petq').val(num(b[18]) || ''); $c.find('.h-petb').val(num(b[22]) || '');
+            $c.find('.h-ins').val(num(b[24])); $c.find('.h-note').val((ex.rowNotes && ex.rowNotes[H.uid]) || '');
+            EDIT.byK[$c.data('k')] = { uid: H.uid, paid: H.paid, row: b, comm: H.comm || {}, orig: { house: b[1], din: a.d, dout: o.d } };
+        });
+        // บ้านที่ไม่อยู่ในรายการ (ชื่อเก่า) → houseData อ่านจาก EDIT
+        var tel = String(b0[3] || '').replace(/^'/, '').split(',').map(function (t) { return t.replace(/\D/g, ''); });
+        $p.find('.g-name').val(b0[2]); $p.find('.g-tel').val(tel[0] || ''); $p.find('.g-tel2').val(tel[1] || '');
+        $p.find('.g-fb').val(b0[4] === '-' ? '' : b0[4]); $p.find('.g-line').val(b0[5] === '-' ? '' : b0[5]);
+        var $ch = $p.find('.g-channel'); if (b0[6] && !$ch.find('option').filter(function () { return this.value === b0[6]; }).length) $ch.append($('<option>').val(b0[6]).text(b0[6]));
+        $ch.val(b0[6]);
+        if (d.company) { $p.find('.g-comp-on').prop('checked', true); $p.find('.g-comp').show(); $p.find('.g-comp-name').val(d.company.name); $p.find('.g-comp-addr').val(d.company.addr); $p.find('.g-comp-tax').val(d.company.tax); $p.find('.g-comp-branch').val(d.company.branch); }
+        if (num(ex.packageTotal) > 0) { $p.find('.g-pkg-on').prop('checked', true); $p.find('.g-pkg').show(); $p.find('.g-pkg-total').val(ex.packageTotal); }
+        $p.find(ex.servicesPer === false ? '#g-per-0' : '#g-per-1').prop('checked', true);
+        var X = String(b0[23] || ''), q = function (re) { var m = X.match(re); return m ? m[1] : ''; };
+        $p.find('.g-ice').val(q(/น้ำแข็ง\s*(\d+)/)); $p.find('.g-water').val(q(/น้ำดื่ม\s*(\d+)/)); $p.find('.g-coal').val(q(/ถ่าน\S*\s*(\d+)/));
+        $p.find('.g-other').val((ex.free || []).filter(function (f) { return !/^(น้ำแข็ง|น้ำดื่ม|ถ่าน)/.test(f); }).join(', '));
+        $p.find('.g-breakfast').val(ex.breakfast || ''); $p.find('.g-note').val(ex.groupNote || ''); $p.find('.g-mat').val(num(b0[29]) || 500);
+        $p.find(d.vat && d.vat.mode === 'excl' ? '#g-vat-e' : d.vat && d.vat.mode === 'incl' ? '#g-vat-i' : '#g-vat-n').prop('checked', true);
+        $p.find('.g-cal').val(d.cal || ('จอง K.' + String(b0[2]).replace(/^คุณ\s*/, ''))).data('touched', 1);
+        // ค่าคอม: รวมทุกหลัง · พนักงาน/ผู้ออกใบ จากหลังแรก
+        var cs = d.houses.map(function (H) { return H.comm || {}; }), c0 = cs[0];
+        var gSum = cs.reduce(function (a, x) { return a + num(x.g); }, 0), hSum = cs.reduce(function (a, x) { return a + num(x.h); }, 0);
+        var isAgentRow = cs.some(function (x) { return String(x.g == null ? '' : x.g).trim() !== ''; });
+        if (isWalkin(b0[6])) $p.find(isAgentRow ? '#g-mode-g' : '#g-mode-a').prop('checked', true);
+        $p.find('.g-g').val(isAgentRow ? gSum : ''); $p.find('.g-h').val(!isAgentRow && c0.found ? hSum : '');
+        var st = String(c0.staff || '').split('+').map(function (s) { return s.trim(); }).filter(String);
+        if (c0.found && !isAgentRow && !st.length) st = ['-'];
+        $p.find('.g-st').each(function () { this.checked = st.indexOf(this.value) !== -1; });
+        if (c0.issuer) { var $is = $p.find('.g-issuer'); if (!$is.find('option').filter(function () { return this.value === c0.issuer; }).length) $is.append($('<option>').val(c0.issuer).text(c0.issuer)); $is.val(c0.issuer); }
+        renumber(); syncComm(); recalc();
+    }
+    function openEdit(gid) {
+        Swal.fire({ title: 'กำลังเปิดใบจองรวม…', allowOutsideClick: false, didOpen: function () { Swal.showLoading(); } });
+        Promise.all([loadOpts(), api('getgroup', { gid: gid })]).then(function (r) {
+            var d = r[1];
+            if (!d || d.status !== 'success') return Swal.fire({ icon: 'error', title: (d && d.message) || 'เปิดใบจองรวมไม่สำเร็จ', confirmButtonText: 'ตกลง' });
+            var $b = $p.find('.g-bank'); if ($b.children().length <= 1) banks().forEach(function (x) { $b.append($('<option>').val(x).text(x)); });
+            fillEdit(d);
+            Swal.close();
+            showhidepage('.groupform,nav');
+            window.scrollTo(0, 0);
+        }).catch(function (e) { console.error(e); Swal.fire({ icon: 'error', title: 'ไม่สามารถเชื่อมต่อกับเซิร์ฟเวอร์ได้', confirmButtonText: 'ตกลง' }); });
+    }
+
+    window.pailayGroup = { open: open, openEdit: openEdit, groups: function () { return GROUPS; }, reloadGroups: loadGroups, computed: function () { return computed(); }, buildPayload: function () { return buildPayload(recalc(), ''); }, validate: function () { return validate(recalc()); } };
 
     $(document).ready(function () {
         $p = $(PAGE).appendTo('body');
@@ -360,6 +466,17 @@
         var $list = $('.listpoolvilla .cardContainer');
         if ($list.length) $list.before('<div class="col-12 mb-2"><button type="button" class="btn btn-outline-primary w-100 g-open"><i class="bi bi-houses me-1"></i>จองหลายหลัง (2–4 หลัง) — ใบจองรวมใบเดียว</button></div>');
         $(document).on('click', '.g-open', open);
+        // ปุ่มแก้ไขของใบที่อยู่ในใบรวม → เปิดฟอร์มหลายหลัง (capture: ก่อน handler ของ script.js)
+        document.addEventListener('click', function (e) {
+            var btn = e.target.closest && e.target.closest('.editinfo, .editinfo2');
+            if (!btn || typeof roomlist === 'undefined') return;
+            var row = roomlist[Number(btn.getAttribute('data-row'))], gid = row && GROUPS[String(row[0]).trim()];
+            if (!gid) return;
+            e.preventDefault(); e.stopPropagation(); e.stopImmediatePropagation();
+            openEdit(gid);
+        }, true);
+        loadGroups();
+        if (typeof window.getdata === 'function') { var og = window.getdata; window.getdata = function () { var r = og.apply(this, arguments); loadGroups(); return r; }; }
         $p.on('click', '.g-back', function () { showhidepage('.listpoolvilla,nav'); });
         $p.on('click', '.g-add', function () { if (cards().length < MAXH) addHouse(); });
         $p.on('click', '.g-del', function () { $(this).closest('.g-house').remove(); renumber(); recalc(); });
