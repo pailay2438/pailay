@@ -38,19 +38,18 @@
         box.innerHTML = '';
         rows.forEach(function (r) {
             var pays = incomes.filter(function (p) { return p[1] === r[0]; });
+            var inD = dayKey(r[8]), outD = dayKey(r[9]);
+            var chip = inD && inD.getTime() === today.getTime() ? ['t', 'เข้าวันนี้'] : inD && inD > today ? ['d', 'รอเข้าพัก'] : outD && outD >= today ? ['ok', 'กำลังพัก'] : ['', 'ออกแล้ว'];
             var $c = $(
-                '<div class="col-md-4 col-12 mb-1"><div class="card mb-1 shadow-sm"><div class="card-body">' +
-                '  <h5 class="card-title mb-1 o-house"></h5>' +
-                '  <div><b>ชื่อผู้จอง:</b> <span class="o-name"></span></div>' +
-                '  <div><b>เบอร์:</b> <span class="o-tel"></span></div>' +
-                '  <div><b>ช่องทาง:</b> <span class="o-ch"></span></div>' +
-                '  <div><b>เข้าพัก:</b> <span class="o-dates"></span></div>' +
-                '  <div><b>ราคารวม:</b> <span class="o-total"></span> บาท</div>' +
-                '  <hr class="my-2"><div class="o-pays small"></div>' +
-                '  <button type="button" class="btn btn-outline-info btn-sm w-100 mt-2 o-pdf"><i class="bi bi-file-earmark-pdf me-1"></i>ดูใบจอง</button>' +
+                '<div class="col-md-4 col-12 mb-1"><div class="card mb-1 plc plc-x"><div class="card-body">' +
+                '  <div class="plc-head"><div class="plc-top"><span class="plc-tag o-house" style="background:#e8e0f5"></span><b class="plc-name o-name"></b><span class="plc-chip ' + chip[0] + '">' + chip[1] + '</span></div>' +
+                '  <div class="plc-kv"><span class="o-dates"></span><b class="o-tel"></b></div>' +
+                '  <div class="plc-kv"><span>ช่องทาง <span class="o-ch"></span></span><b>฿<span class="o-total"></span></b></div></div>' +
+                '  <div class="plc-extra o-pays"></div>' +
+                '  <div class="plc-acts"><button type="button" class="btn sec o-pdf"><i class="bi bi-file-earmark-pdf"></i> ดูใบจอง</button></div>' +
                 '</div></div></div>');
             // ใส่ข้อความด้วย .text() กันอักขระพิเศษ
-            $c.find('.o-house').text('บ้าน: ' + (r[1] || ''));
+            $c.find('.o-house').text(r[1] || '');
             $c.find('.o-name').text(r[2] || '-');
             $c.find('.o-tel').text(r[3] || '-');
             $c.find('.o-ch').text(r[6] || '-');

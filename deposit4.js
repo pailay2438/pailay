@@ -60,15 +60,16 @@
             return '<p class="card-text">' + esc(r[7]) + ': ' + esc(checkAndFormatDate(r[3])) + ' · ' + money(num(r[4])) + ' บาท</p>';
         }).join('');
         var due = item.plan.amt[item.next - 1];
-        return '<div class="card mb-1 shadow-sm clickable-card" data-row="' + idx + '"><div class="card-body"><div class="d-flex justify-content-between align-items-start">' +
-            '<div class="card-content"><h5 class="card-title">บ้าน: ' + esc(room[1] || '') + '</h5>' +
-            '<p class="card-text">ชื่อผู้จอง: ' + esc(room[2] || '') + '</p>' +
-            '<p class="card-text">วันที่เข้าพัก: ' + esc(checkAndFormatDate(room[8])) + '</p><hr>' +
-            '<p class="card-text">แบ่ง ' + item.plan.n + ' งวด · ชำระแล้ว ' + item.rows.length + ' งวด</p>' +
-            '<p class="card-text">งวดที่ 1: ' + esc(checkAndFormatDate(r1[3])) + ' · ' + money(item.plan.amt[0]) + ' บาท</p>' + paidLines + '<hr>' +
-            '<p class="card-text fw-semibold">งวดที่ ' + item.next + ' ค้างชำระอีก : ' + money(due) + ' บาท</p></div>' +
-            '<div class="d-flex gap-2 align-items-center">' + (img ? '<div>' + img + '</div>' : '') +
-            '<button class="btn btn-outline-primary btn-sm edits" data-row="' + idx + '"><i class="bi bi-pencil-square"></i> เพิ่มการชำระงวดที่ ' + item.next + '</button></div>' +
+        var H = (window.pailayHouse || function (n) { return { short: String(n || '').split(' ')[0], c: '#dfe7ec' }; })(room[1]);
+        var lines = '<div class="plc-line"><span>งวดที่ 1 · ' + esc(checkAndFormatDate(r1[3])) + '</span><b>' + money(item.plan.amt[0]) + '</b></div>' +
+            item.rows.filter(function (r) { return r !== r1; }).map(function (r) { return '<div class="plc-line"><span>' + esc(r[7]) + ' · ' + esc(checkAndFormatDate(r[3])) + '</span><b>' + money(num(r[4])) + '</b></div>'; }).join('');
+        return '<div class="col-md-4 col-12 mb-1"><div class="card mb-1 plc plc-x clickable-card" data-row="' + idx + '"><div class="card-body"><div class="plc-head">' +
+            '<div class="plc-top"><span class="plc-tag" style="background:' + H.c + '">' + esc(H.short) + '</span><b class="plc-name">' + esc(room[2] || '') + '</b><span class="plc-chip w">งวดที่ ' + item.next + '/' + item.plan.n + '</span></div>' +
+            '<div class="plc-kv"><span>เข้าพัก ' + esc(checkAndFormatDate(room[8])) + '</span><b>ชำระแล้ว ' + item.rows.length + '/' + item.plan.n + ' งวด</b></div></div>' +
+            '<div class="plc-extra">' + lines + '</div>' +
+            '<div class="plc-kv plc-due"><span>งวดที่ ' + item.next + ' ค้างชำระ</span><b class="plc-red">฿' + money(due) + '</b></div>' +
+            '<div class="plc-acts">' + (img ? '<button type="button" class="btn sec plc-slip" onclick="event.stopPropagation();openImagePopup(\'' + esc(r1[6]) + '\')"><i class="bi bi-image"></i> สลิป</button>' : '') +
+            '<button class="btn pri edits" data-row="' + idx + '"><i class="bi bi-cash-coin"></i> ชำระงวดที่ ' + item.next + '</button></div>' +
             '</div></div></div>';
     }
     function openPay(item, room) {

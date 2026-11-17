@@ -99,7 +99,9 @@
         '<div class="col-6">' + fl('g-paydate', 'วันที่รับเงิน *', 'date') + '</div>' +
         '<div class="col-6">' + fl('g-deposit', 'ยอดมัดจำรวม *', 'text', 'inputmode="decimal"') + '</div>' +
         '<div class="col-12 g-bankwrap"><div class="form-floating mb-1"><select class="form-select g-bank"><option value="">เลือกบัญชี</option></select><label>รับเงินผ่านบัญชี *</label></div>' +
-        '<label class="form-label small mb-1">สลิปโอนเงิน *</label><input type="file" accept="image/*" class="form-control mb-1 g-slip"></div>' +
+        '<label class="form-label small mb-1">สลิปโอนเงิน *</label><input type="file" accept="image/*" class="form-control mb-1 g-slip">' +
+        '<div class="g-ms"><div class="g-ms-first" style="display:none">' + fl('g-ms-amt1', 'ยอดสลิปที่ 1 (สลิปด้านบน) *', 'text', 'inputmode="decimal"') + '</div><div class="g-ms-rows"></div>' +
+        '<button type="button" class="btn btn-sm btn-outline-primary w-100 g-ms-add">+ ลูกค้าโอนหลายสลิป (สูงสุด 3 สลิป)</button></div></div>' +
         '<div class="col-12 mt-1"><div class="fw-semibold">แบ่งมัดจำลงแต่ละหลัง <span class="small text-muted">(ตามสัดส่วนราคา แก้ได้)</span></div><div class="g-alloc"></div></div>' +
         '<div class="col-12 mt-2"><div class="g-sum p-2 rounded" style="background:rgba(13,110,253,.06)"></div></div>' +
         '</fieldset>' +
@@ -238,6 +240,44 @@
         }).catch(function () { opts = { channels: [], staff: [], issuers: [], ownChannels: [] }; return opts; });
     }
 
+    /* ---------- หลายสลิป (โอนจ่าย) — มัดจำรวม = ผลรวมสลิป · หลังบ้านกระจายสลิปลงแต่ละหลัง (multislip.gs) ---------- */
+    function msRows() { return $p.find('.g-ms-row'); }
+    function msRow(k) {
+        var opts = banks().map(function (b) { return '<option value="' + esc(b) + '">' + esc(b) + '</option>'; }).join('');
+        return '<div class="g-ms-row border rounded p-2 mb-1"><div class="d-flex justify-content-between align-items-center mb-1"><b class="small g-ms-lab">สลิปที่ ' + k + '</b><button type="button" class="btn btn-sm btn-outline-danger py-0 g-ms-del">ลบ</button></div>' +
+            fl('g-ms-amt', 'ยอดสลิปที่ ' + k + ' *', 'text', 'inputmode="decimal"') +
+            '<div class="form-floating mb-1"><select class="form-select g-ms-acc"><option value="">เลือกบัญชี</option>' + opts + '</select><label>รับเงินผ่านบัญชี *</label></div>' +
+            '<input type="file" accept="image/*" class="form-control g-ms-file"></div>';
+    }
+    function msSync() {
+        var n = msRows().length, on = $p.find('input[name=g-pay]:checked').val() === 'โอนจ่าย';
+        $p.find('.g-ms').toggle(on);
+        msRows().each(function (i) { $(this).find('.g-ms-lab').text('สลิปที่ ' + (i + 2)); });
+        $p.find('.g-ms-first').toggle(n > 0);
+        $p.find('.g-ms-add').toggle(n < 2).text(n ? '+ เพิ่มสลิปที่ ' + (n + 2) : '+ ลูกค้าโอนหลายสลิป (สูงสุด 3 สลิป)');
+        var $d = $p.find('.g-deposit');
+        if (n > 0 && on) {
+            var sum = num($p.find('.g-ms-amt1').val());
+            msRows().each(function () { sum += num($(this).find('.g-ms-amt').val()); });
+            $d.prop('readonly', true);
+            if (num($d.val()) !== sum) { $d.val(sum || ''); allocDirty = false; recalc(); }
+        } else $d.prop('readonly', false);
+    }
+    function msActive() { return msRows().length > 0 && $p.find('input[name=g-pay]:checked').val() === 'โอนจ่าย'; }
+    function msValidate() {
+        if (!msActive()) return '';
+        if (!(num($p.find('.g-ms-amt1').val()) > 0)) return 'กรุณาใส่ยอดสลิปที่ 1';
+        var err = '';
+        msRows().each(function (i) {
+            if (err) return;
+            var $r = $(this), k = i + 2;
+            if (!(num($r.find('.g-ms-amt').val()) > 0)) err = 'กรุณาใส่ยอดสลิปที่ ' + k;
+            else if (!$r.find('.g-ms-acc').val()) err = 'กรุณาเลือกบัญชีของสลิปที่ ' + k;
+            else if (!($r.find('.g-ms-file')[0].files || []).length) err = 'กรุณาแนบรูปสลิปที่ ' + k;
+        });
+        return err;
+    }
+
     /* ---------- บันทึก ---------- */
     function validate(c) {
         if (!String($p.find('.g-name').val()).trim()) return 'กรุณาใส่ชื่อผู้จอง';
@@ -282,6 +322,7 @@
             if (!($p.find('.g-slip')[0].files || []).length) return 'กรุณาแนบสลิปโอนเงิน';
         }
         if (pay === 'card' && !($p.find('.g-slip')[0].files || []).length) return 'กรุณาแนบสลิปเครื่องรูดบัตร';
+        var msErr = msValidate(); if (msErr) return msErr;
         var al = $p.find('.g-al').map(function () { return num(this.value); }).get();
         if (Math.abs(al.reduce(function (a, b) { return a + b; }, 0) - dep) > 0.01) return 'ผลรวมมัดจำที่แบ่งลงแต่ละหลังต้องเท่ากับยอดมัดจำรวม';
         if (dep > c.total + c.vatAdd + c.ins) return 'มัดจำมากกว่ายอดรวมทั้งหมด';
@@ -341,8 +382,11 @@
             showCancelButton: true, confirmButtonText: 'บันทึก', cancelButtonText: 'กลับไปแก้', reverseButtons: true
         }).then(function (r) {
             if (!r.isConfirmed) return;
-            return fileData($p.find('.g-slip')[0]).then(function (slip) {
+            var msFiles = msActive() ? msRows().map(function () { return $(this).find('.g-ms-file')[0]; }).get() : [];
+            return Promise.all([fileData($p.find('.g-slip')[0])].concat(msFiles.map(fileData))).then(function (all) {
+                var slip = all[0];
                 var payload = buildPayload(c, $p.find('input[name=g-pay]:checked').val() !== 'เงินสด' ? slip : '');
+                if (msFiles.length) payload.ms = { amt1: num($p.find('.g-ms-amt1').val()), extra: msRows().map(function (i) { return { amount: num($(this).find('.g-ms-amt').val()), acc: $(this).find('.g-ms-acc').val(), slip: all[i + 1] || '' }; }).get() };
                 showhidepage('header');
                 return api('savegroup', { payload: JSON.stringify(payload) }).then(function (res) {
                     Swal.fire({ icon: res.status === 'success' ? 'success' : 'error', title: res.status === 'success' ? 'บันทึกเรียบร้อย' : 'บันทึกไม่สำเร็จ', text: res.message, confirmButtonText: 'ตกลง' }).then(function () {
@@ -386,6 +430,7 @@
         $p.find('input[type=checkbox]').prop('checked', false); $p.find('.g-comp, .g-pkg').hide();
         $p.find('.g-slip').val(''); $p.find('#g-pay-2, #g-per-1, #g-vat-n').prop('checked', true); $p.find('.g-bank').closest('.form-floating').show(); $p.find('.g-bankwrap').show();
         $p.find('.g-houses').empty(); allocDirty = false;
+        $p.find('.g-ms-rows').empty(); $p.find('.g-deposit').prop('readonly', false); $p.find('.g-ms-first').hide();
         addHouse(false); addHouse();
         $p.find('.g-paydate').val(today());
     }
@@ -464,8 +509,19 @@
         $p = $(PAGE).appendTo('body');
         $('<style>.groupform .form-floating>label{max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.groupform .form-check-label{white-space:normal}</style>').appendTo('head');
         var $list = $('.listpoolvilla .cardContainer');
-        if ($list.length) $list.before('<div class="col-12 mb-2"><button type="button" class="btn btn-outline-primary w-100 g-open"><i class="bi bi-houses me-1"></i>จองหลายหลัง (2–4 หลัง) — ใบจองรวมใบเดียว</button></div>');
-        $(document).on('click', '.g-open', open);
+        // การ์ด "จองหลายหลัง" ในรายการบ้าน = รองสุดท้าย (ก่อนการ์ดบ้านพักนอกเครือของ menu.js) · crehouse() วาดใหม่ทุกครั้ง → ดูด้วย MutationObserver
+        var GROUP_CARD = '<div class="col-12 col-md-4 group-card-col"><div class="card mb-1 shadow position-relative"><div class="card-body text-center g-open outside-card" role="button">' +
+            '<div class="outside-card-icon rounded mb-0"><i class="bi bi-houses"></i></div><h5 class="card-title fw-bold">จองหลายหลัง (2–4 หลัง)</h5><div class="small text-muted">ใบจองรวมใบเดียว</div></div></div></div>';
+        var placeGroupCard = function () {
+            var c = $list[0];
+            if (!c || !c.querySelector('.card-row')) return;
+            var out = c.querySelector('.outside-card-col'), mine = c.querySelector('.group-card-col');
+            if (mine && ((out && mine.nextElementSibling === out) || (!out && mine === c.lastElementChild))) return;
+            if (mine) mine.remove();
+            if (out) out.insertAdjacentHTML('beforebegin', GROUP_CARD); else c.insertAdjacentHTML('beforeend', GROUP_CARD);
+        };
+        if ($list.length) { placeGroupCard(); new MutationObserver(function () { setTimeout(placeGroupCard, 0); }).observe($list[0], { childList: true }); }
+        $(document).on('click', '.g-open', function (e) { e.preventDefault(); e.stopPropagation(); open(); window.scrollTo(0, 0); });
         // ปุ่มแก้ไขของใบที่อยู่ในใบรวม → เปิดฟอร์มหลายหลัง (capture: ก่อน handler ของ script.js)
         document.addEventListener('click', function (e) {
             var btn = e.target.closest && e.target.closest('.editinfo, .editinfo2');
@@ -492,6 +548,10 @@
             if (h.full && h.din && h.dout && overlap(h.full, h.din, h.dout)) Swal.fire({ icon: 'error', title: h.full + ' มีจองแล้วในช่วงวันที่เลือก', confirmButtonText: 'ตกลง' });
             recalc();
         });
+        $p.on('click', '.g-ms-add', function () { if (msRows().length < 2) { $p.find('.g-ms-rows').append(msRow(msRows().length + 2)); if (!$p.find('.g-ms-amt1').val()) $p.find('.g-ms-amt1').val($p.find('.g-deposit').val()); msSync(); } });
+        $p.on('click', '.g-ms-del', function () { $(this).closest('.g-ms-row').remove(); msSync(); });
+        $p.on('input', '.g-ms-amt1, .g-ms-amt', msSync);
+        $p.on('change', 'input[name=g-pay]', msSync);
         $p.on('input change', '.h-night, .h-bedb, .h-petb, .h-ins, .g-deposit, .g-pkg-total, .g-pkg-on', function () { if (!$(this).hasClass('g-al')) allocDirty = false; recalc(); });
         $p.on('input', '.g-al', function () { allocDirty = true; recalc(); });
         $p.on('change', '.g-pkg-on', function () { $p.find('.g-pkg').toggle(this.checked); });

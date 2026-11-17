@@ -174,4 +174,5 @@
         });
     });
     window.pailayCards = { run: run };
+    window.pailayHouse = house; // ใช้ร่วม: deposit4.js / postpone.js (ป้ายสีบ้าน)
 })();

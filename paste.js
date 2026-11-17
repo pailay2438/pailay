@@ -231,6 +231,69 @@
         Swal.fire({ icon: warn.length ? 'warning' : 'success', title: 'เติมข้อมูลจากข้อความแล้ว', html: html, confirmButtonText: 'ตรวจฟอร์ม' });
     }
 
+    // ใบเสนอราคา / บ้านนอกเครือ (#houseoutside ช่อง booking_*) — ใช้ตัวอ่านข้อความเดียวกัน (17 พ.ย. 2569)
+    async function fillQuote(o) {
+        var done = [], miss = [], warn = [];
+        var isQuote = /ใบเสนอราคา/.test($('#formtype').text() || $('.formtype').first().text() || '');
+        var $h = $('#booking_namehouses');
+        if ($h.is('select')) {
+            var hk = HOUSES.filter(function (x) { return x.key === o.house; })[0];
+            var opt = hk ? $h.find('option').filter(function () { return this.value && hk.re.test(this.value); }).first() : $();
+            if (opt.length) { setVal($h, opt.val()); done.push('บ้าน: ' + opt.val()); } else { miss.push('ชื่อบ้านพัก'); mark($h, 'paste-need'); }
+        } else if ($h.length) {
+            if (o.houseText) { setVal($h, o.houseText); done.push('บ้าน: ' + o.houseText); } else { miss.push('ชื่อบ้านพัก'); mark($h, 'paste-need'); }
+        }
+        if (o.name) { setVal('#booking_name', o.name); done.push('ชื่อลูกค้า: ' + o.name); } else { miss.push('ชื่อลูกค้า'); mark($('#booking_name'), 'paste-need'); }
+        if (o.phones) {
+            setVal('#booking_tel', o.phones[0]);
+            var $p2 = $('#booking_tel').closest('.col-12, [class*="col-"]').parent().find('.phone2').first();
+            if (o.phones[1] && $p2.length) setVal($p2, o.phones[1]);
+            done.push('เบอร์: ' + o.phones.join(', '));
+        } else { miss.push('เบอร์ติดต่อ'); mark($('#booking_tel'), 'paste-need'); }
+        if (o.channel) {
+            var opts = $('#comm_channel_list option').map(function () { return String(this.value || '').trim(); }).get().filter(String);
+            var norm = function (x) { return String(x).toLowerCase().replace(/[\s@._\-]/g, ''); };
+            var want = norm(o.channel), hit = opts.filter(function (x) { return norm(x) === want; })[0] ||
+                opts.filter(function (x) { return norm(x) && (want.indexOf(norm(x)) >= 0 || norm(x).indexOf(want) >= 0); }).sort(function (a, b) { return b.length - a.length; })[0];
+            setVal('#booking_channel', hit || o.channel);
+            if (hit) done.push('ช่องทาง: ' + hit); else { warn.push('ช่องทาง "' + o.channel + '" ไม่อยู่ในรายการ — เลือกใหม่'); mark($('#booking_channel'), 'paste-need'); }
+        } else { miss.push('ช่องทางการจอง'); mark($('#booking_channel'), 'paste-need'); }
+        if (o.line) { setVal('#booking_line', o.line); done.push('Line: ' + o.line); }
+        if (o.fb) { setVal('#booking_facebook', o.fb); done.push('Facebook: ' + o.fb); }
+        if (o.start && o.end) {
+            setVal('#booking_timestart', o.start); setVal('#booking_timeend', o.end);
+            if (o.startTime) setVal('#booking_starttime', o.startTime);
+            if (o.endTime) setVal('#booking_endtime', o.endTime);
+            await sleep(120);
+            done.push('เข้า ' + thDate(o.start) + ' ' + (o.startTime || '') + ' · ออก ' + thDate(o.end) + ' ' + (o.endTime || '') + ' (' + $('#booking_timevalue').val() + ' คืน)');
+            if (o.nights && Number($('#booking_timevalue').val()) !== o.nights) warn.push('ข้อความบอก ' + o.nights + ' คืน แต่วันที่คำนวณได้ ' + $('#booking_timevalue').val() + ' คืน');
+        } else miss.push('วันเข้า/ออก');
+        var $n = $('.nightse .night-inputs');
+        if (o.price && $n.length) {
+            var per = Math.floor(o.price / $n.length), rest = o.price - per * $n.length;
+            $n.each(function (i) { setVal(this, String(per + (i === $n.length - 1 ? rest : 0))); });
+            done.push('ราคาที่พัก ' + money(o.price) + ' บาท' + ($n.length > 1 ? ' (แบ่งเท่ากัน ' + $n.length + ' คืน — ตรวจถ้าราคาแต่ละคืนไม่เท่ากัน)' : ''));
+        } else if (!o.price) miss.push('ราคาที่พัก');
+        if (o.guests) { setVal('#booking_quser', String(o.guests)); done.push('ผู้เข้าพัก ' + o.guests + ' ท่าน'); } else miss.push('จำนวนผู้เข้าพัก');
+        if (o.rooms) { setVal('#booking_qroom', String(o.rooms)); done.push(o.rooms + ' ห้องนอน'); } else miss.push('จำนวนห้อง');
+        if (o.insurance != null) { setVal('#booking_totalhouse', String(o.insurance)); done.push('ค่าประกัน ' + money(o.insurance) + ' บาท'); } else miss.push('ค่าประกันบ้านพัก');
+        (o.gifts || []).forEach(function (g) {
+            var $c = $('#booking_free_' + g.n);
+            if (!$c.length) return;
+            if (!$c.is(':checked')) $c.trigger('click');
+            setVal('#booking_free_price_' + g.n, String(g.qty));
+            done.push('แถม' + g.label + ' ' + g.qty);
+        });
+        if (isQuote && o.deposit && $('#booking_paytotal').length) { setVal('#booking_paytotal', String(o.deposit)); done.push('มัดจำ ' + money(o.deposit) + ' บาท'); }
+        if (isQuote && !$('#nquotation').val()) { miss.push('ผู้ออกใบเสนอราคา'); mark($('#nquotation'), 'paste-need'); }
+        var html = '<div style="text-align:left;font-size:.92rem;line-height:1.55">' +
+            '<b>เติมให้แล้ว</b> <span style="color:#0a7ea4">(กรอบฟ้า)</span><br>' + done.map(function (x) { return '• ' + esc(x); }).join('<br>') +
+            (warn.length ? '<br><br><b style="color:#c0392b">ต้องตรวจ</b><br>' + warn.map(function (x) { return '⚠️ ' + esc(x); }).join('<br>') : '') +
+            (miss.length ? '<br><br><b style="color:#b26a00">ยังต้องกรอกเอง</b> <span style="color:#b26a00">(กรอบส้ม)</span><br>' + miss.map(function (x) { return '• ' + esc(x); }).join('<br>') : '') +
+            '<br><br><small>ตรวจทุกช่องอีกครั้งก่อนกดบันทึก</small></div>';
+        Swal.fire({ icon: warn.length ? 'warning' : 'success', title: 'เติมข้อมูลจากข้อความแล้ว', html: html, confirmButtonText: 'ตรวจฟอร์ม' });
+    }
+
     async function openPaste() {
         var r = await Swal.fire({
             title: 'วางข้อความปิดการขาย',
@@ -245,7 +308,7 @@
             inputValidator: function (v) { return String(v || '').trim().length < 20 ? 'วางข้อความปิดการขายก่อน' : null; }
         });
         if (!r.isConfirmed) return;
-        try { await fill(parse(r.value)); }
+        try { if ($('#houseoutside').is(':visible')) await fillQuote(parse(r.value)); else await fill(parse(r.value)); }
         catch (e) { console.error('paste fill', e); Swal.fire({ icon: 'error', title: 'เติมข้อมูลไม่สำเร็จ', text: String(e && e.message || e) }); }
     }
 
@@ -256,8 +319,9 @@
         // ใส่หลัง ready ของไฟล์อื่น (removeinvalid ล้างเฉพาะ input — แถบนี้มีแต่ปุ่ม)
         $('.listpoolvilla > .container > .row > fieldset > legend').first().after(BAR);
         $('#formpoolvilla > .container > .row > fieldset > legend').first().after(BAR);
+        $('#houseoutside > .container > .row > fieldset > legend').first().after(BAR); // ใบเสนอราคา / บ้านนอกเครือ
         $(document).on('click', '.paste-open', openPaste);
     });
 
-    window.pailayPaste = { parse: parse }; // ใช้ทดสอบในคอนโซล
+    window.pailayPaste = { parse: parse, fillQuote: fillQuote }; // ใช้ทดสอบในคอนโซล
 })();

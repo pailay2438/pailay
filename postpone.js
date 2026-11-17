@@ -64,19 +64,20 @@
         uids.forEach(function (uid) {
             var p = postponed[uid];
             var b = (typeof roomlist !== 'undefined' && roomlist.find(function (r) { return r[0] === uid; })) || [];
+            var H = (window.pailayHouse || function (n) { return { short: String(n || '').split(' ')[0], c: '#dfe7ec' }; })(b[1]);
             var $card = $(
-                '<div class="col-md-4 col-12 mb-1"><div class="card mb-1 shadow-sm"><div class="card-body">' +
-                '  <button class="btn btn-outline-success btn-sm w-100 mb-2 pp-reschedule"><i class="bi bi-calendar-plus me-1"></i>กำหนดวันเข้าพักใหม่</button>' +
-                '  <button class="btn btn-outline-danger btn-sm w-100 mb-2 pp-cancel-stay"><i class="bi bi-x-circle me-1"></i>ยกเลิกการเข้าพัก</button>' +
-                '  <div><b>บ้าน:</b> <span class="pp-house"></span></div>' +
-                '  <div><b>ชื่อผู้จอง:</b> <span class="pp-name"></span></div>' +
-                '  <div><b>เบอร์:</b> <span class="pp-tel"></span></div>' +
-                '  <div><b>วันเข้าพักเดิม:</b> <span class="pp-dates"></span></div>' +
-                '  <div><b>เหตุผล:</b> <span class="pp-reason"></span></div>' +
-                '  <div class="text-muted small mt-1">เลื่อนเมื่อ <span class="pp-when"></span> โดย <span class="pp-by"></span> · UID <span class="pp-uid"></span></div>' +
+                '<div class="col-md-4 col-12 mb-1"><div class="card mb-1 plc plc-x"><div class="card-body">' +
+                '  <div class="plc-head"><div class="plc-top"><span class="plc-tag pp-house"></span><b class="plc-name pp-name"></b><span class="plc-chip d">เลื่อนไม่มีกำหนด</span></div>' +
+                '  <div class="plc-kv"><span>วันเข้าพักเดิม</span><b class="pp-dates"></b></div>' +
+                '  <div class="plc-kv"><span>เบอร์</span><b class="pp-tel"></b></div></div>' +
+                '  <div class="plc-extra"><div class="plc-line"><span>เหตุผล: <span class="pp-reason"></span></span></div>' +
+                '  <div class="plc-line plc-meta"><span>เลื่อนเมื่อ <span class="pp-when"></span> โดย <span class="pp-by"></span> · UID <span class="pp-uid"></span></span></div></div>' +
+                '  <div class="plc-acts"><button class="btn danger pp-cancel-stay"><i class="bi bi-x-circle"></i> ยกเลิกการเข้าพัก</button>' +
+                '  <button class="btn pri pp-reschedule"><i class="bi bi-calendar-plus"></i> กำหนดวันใหม่</button></div>' +
                 '</div></div></div>');
+            $card.find('.pp-house').css('background', H.c);
             // ใส่ข้อความด้วย .text() กันอักขระพิเศษในชื่อ/เหตุผล
-            $card.find('.pp-house').text(b[1] || '-');
+            $card.find('.pp-house').text(H.short || b[1] || '-');
             $card.find('.pp-name').text(b[2] || '-');
             $card.find('.pp-tel').text(b[3] || '-');
             $card.find('.pp-dates').text(fmtDate(p[4]) + ' → ' + fmtDate(p[5]));

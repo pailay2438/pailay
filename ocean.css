@@ -251,3 +251,23 @@ main.formpoolvilla.pls-on { padding-bottom: 90px; }
 @media (min-width: 992px) { body.pl-in .pls-bar { left: var(--pl-side); padding-left: 28px; padding-right: 28px; } }
 .pls-steps { background: var(--pl-card, #fff); border: 1px solid var(--pl-line); border-radius: 16px; padding: 10px 10px 8px; box-shadow: var(--pl-shadow); margin-bottom: 0; }
 .pls-hint { background: var(--pl-card, #fff); border: 1px solid var(--pl-line); border-top: 0; border-radius: 0 0 16px 16px; margin: -8px 6px 12px; padding: 10px 0 4px; }
+
+/* ---------- การ์ดหน้าค้างชำระ / เลื่อน / นอกเครือ (plc-x) ---------- */
+#usertables { display: flex; flex-wrap: wrap; margin: 0 -6px; }
+#usertables > div { padding: 0 6px; }
+.plc-x.clickable-card { cursor: pointer; }
+.plc-extra { background: var(--pl-bg); border: 1px solid var(--pl-line); border-radius: 12px; padding: 8px 10px; font-size: 12.5px; color: var(--pl-muted); }
+.plc-extra:empty { display: none; }
+.plc-line { display: flex; justify-content: space-between; gap: 8px; padding: 2px 0; }
+.plc-line b { color: var(--pl-text); font-weight: 600; }
+.plc-meta { font-size: 11.5px; opacity: .85; }
+.plc-due { margin-top: 8px; font-size: 13.5px; }
+.plc-acts { display: flex; gap: 8px; margin-top: 10px; }
+.plc-acts .btn { flex: 1; min-height: 42px; border-radius: 12px; font-weight: 600; font-size: 14px; border: 0; }
+.plc-acts .btn.pri { flex: 1.4; background: var(--pl-blue) !important; color: #fff !important; }
+.plc-acts .btn.sec { background: var(--pl-ice) !important; color: var(--pl-blue) !important; }
+.plc-acts .btn.danger { background: #fdecec !important; color: var(--pl-bad) !important; }
+body[data-bs-theme="dark"] .plc-acts .btn.danger { background: #3a1517 !important; }
+.plc-acts .btn:disabled { opacity: .55; }
+.plc-x .o-pays img { border-radius: 8px; }
+.plc-chip:not(.t):not(.w):not(.ok):not(.d) { background: var(--pl-bg); color: var(--pl-muted); border: 1px solid var(--pl-line); }
