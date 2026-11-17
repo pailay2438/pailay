@@ -153,7 +153,7 @@
         var list = c.lateIn.map(function (b) { return itemHtml(b, '<span class="plh-tag t">เลยวันเข้า</span>'); })
             .concat(c.inToday.map(function (b) { return itemHtml(b, '<span class="plh-tag w">วันนี้</span>'); }))
             .concat(c.inTmr.map(function (b) { return itemHtml(b, '<span class="plh-tag ok">พรุ่งนี้</span>'); }))
-            .concat(c.soon.slice(0, 6).map(function (b) { var d = ymd(b[8]), dd = new Date(d + 'T00:00:00'); return itemHtml(b, '<span class="plh-tag" style="background:var(--pl-ice);color:var(--pl-blue)">' + TH_D[dd.getDay()] + ' ' + dd.getDate() + '</span>'); }));
+            .concat(c.soon.slice(0, 6).map(function (b) { var d = ymd(b[8]), dd = new Date(d + 'T00:00:00'); return itemHtml(b, '<span class="plh-tag d">' + TH_D[dd.getDay()] + ' ' + dd.getDate() + '</span>'); }));
         var left = '<div class="plh-sec"><b>รอเช็คอิน 7 วันข้างหน้า</b><a data-go=".checkin">ดูทั้งหมด</a></div><div class="plh-card mb-3">' + (list.length ? list.join('') : '<div class="plh-empty">ไม่มีลูกค้าเข้าพักใน 7 วันข้างหน้า</div>') + '</div>';
         // ปฏิทินบ้านว่าง 7 วัน (คอม)
         var dr = arr('dayroom'), rooms = arr('room').map(function (r) { return r[0]; }).filter(Boolean);

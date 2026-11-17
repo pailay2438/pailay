@@ -172,3 +172,54 @@ body.pl-in > main { overflow-x: clip; }
     body.pl-in > nav.navbar .dark-mode-icon { align-self: flex-start; margin-left: 8px; cursor: pointer; }
 }
 #profile[src=""], #profile:not([src]) { display: none; }
+
+/* ---------- การ์ดรายการ (เฟส 2 · cards.js) ---------- */
+.card.plc { border-radius: 18px; border: 1px solid var(--pl-line); box-shadow: var(--pl-shadow); }
+.plc > .card-body { padding: 14px 14px 10px; }
+.plc .card-content, .plc .card-body > hr, .plc .today-badge { display: none !important; }
+.plc-head { margin-bottom: 10px; color: var(--pl-text); }
+.plc-top { display: flex; align-items: center; gap: 8px; }
+.plc-tag { font-size: 11.5px; font-weight: 700; padding: 3px 9px; border-radius: 999px; color: #24323a; white-space: nowrap; }
+.plc-name { font-size: 15px; flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.plc-grp { color: var(--pl-muted); }
+.plc-chip { font-size: 11px; font-weight: 600; padding: 3px 9px; border-radius: 999px; white-space: nowrap; }
+.plc-chip.t { background: #ffe4e4; color: #c62828; }
+.plc-chip.w { background: #fff4e0; color: #b45309; }
+.plc-chip.ok { background: #e3f7ea; color: #15803d; }
+.plc-chip.d, .plh-tag.d { background: var(--pl-ice); color: var(--pl-blue); }
+body[data-bs-theme="dark"] .plc-chip.d, body[data-bs-theme="dark"] .plh-tag.d { color: var(--pl-sky); }
+.plc-kv { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; color: var(--pl-muted); margin-top: 6px; }
+.plc-kv b { color: var(--pl-text); font-weight: 600; white-space: nowrap; }
+.plc-kv b.plc-red { color: var(--pl-bad); }
+/* ปุ่ม: รอง · หลัก · ⋯ แถวเดียว / ที่เหลืออยู่ใต้ ⋯ */
+.plc .card-body > .row { margin: 0 -4px; }
+.plc .card-body > .row > * { padding: 0 4px; }
+.plc .plc-sec { flex: 0 0 38%; max-width: 38%; order: 1; }
+.plc .plc-pri { flex: 1 1 0; max-width: none; order: 2; }
+.plc.plc-nopri .plc-sec { flex: 1 1 0; max-width: none; }
+.plc .plc-tg { flex: 0 0 52px; max-width: 52px; order: 3; margin-bottom: .25rem; }
+.plc .plc-more { flex: 0 0 100%; max-width: 100%; order: 4; }
+.plc:not(.plc-open) .plc-more { display: none !important; }
+.plc .plc-pri .btn, .plc .plc-sec .btn, .plc .plc-tg .btn { min-height: 42px; font-size: 14px; font-weight: 600; border-radius: 12px; height: 100%; }
+.plc .plc-pri .btn { background: var(--pl-blue); color: #fff; border: 0; }
+.plc .plc-pri .btn:hover { background: var(--pl-navy); }
+.plc .plc-sec .btn { background: var(--pl-ice); color: var(--pl-blue); border: 0; }
+.plc .plc-tg .btn { width: 100%; border: 1px solid var(--pl-line); color: var(--pl-muted); background: var(--pl-card, #fff); }
+.plc.plc-open .plc-tg .btn { background: var(--pl-ice); color: var(--pl-blue); }
+.plc.plc-open .card-body > .row:first-of-type { border-bottom: 0; }
+.plc .plc-more .btn { min-height: 38px; text-align: left; border-radius: 10px; }
+.plc .ota-badge, .plc .ota-payout-wrap { margin-bottom: 8px !important; }
+.plc-seg { display: flex; gap: 4px; background: var(--pl-card, #fff); border: 1px solid var(--pl-line); border-radius: 14px; padding: 4px; margin: 0 0 12px; overflow-x: auto; }
+.plc-seg button { flex: 1 0 auto; border: 0; background: none; border-radius: 10px; padding: 8px 10px; font: inherit; font-size: 13px; color: var(--pl-muted); white-space: nowrap; }
+.plc-seg button.on { background: var(--pl-blue); color: #fff; font-weight: 600; }
+.plc-seg button span { opacity: .8; font-size: 12px; }
+.plc-hide { display: none !important; }
+.plc .plc-pri .btn { background: var(--pl-blue) !important; color: #fff !important; border-color: var(--pl-blue) !important; }
+.plc .plc-pri .btn i { color: #fff !important; }
+.plc .plc-sec .btn { background: var(--pl-ice) !important; color: var(--pl-blue) !important; border-color: var(--pl-ice) !important; }
+.plc .plc-sec .btn i { color: var(--pl-blue) !important; }
+.plc .plc-more .btn { background: var(--pl-card, #fff) !important; color: var(--pl-text) !important; border-color: var(--pl-line) !important; }
+.plc .plc-more .btn i { color: var(--pl-blue) !important; }
+.plc .plc-more .btn.btn-outline-danger, .plc .plc-more .btn.btn-outline-danger i { color: var(--pl-bad) !important; }
+.plc.plc-nopri.plc-nosec .plc-tg { flex: 1 1 auto; max-width: none; }
+.plc.plc-nopri.plc-nosec .plc-tg .btn::after { content: ' เมนูเพิ่มเติม'; font-size: 13px; }
