@@ -60,7 +60,7 @@
         var inc = incomeOf(uid);
         var depRows = inc.filter(function (r) { return String(r[8]) === 'ไม่แบ่งมัดจำ'; });
         var special = inc.some(function (r) { return /OTA|วอล์กอิน/.test(String(r[2])); });
-        if (String(b[31]) === 'ไม่แบ่ง' && depRows.length && !special) {
+        if (String(b[31]) === 'ไม่แบ่ง' && depRows.length === 1 && !special) { // หลายสลิป → multislip.js
             cur.depOld = num(depRows[0][4]); cur.editable = true;
             $f.find('.bp-dep-old').text('(ยอดเดิม ' + money(cur.depOld) + ' บาท)');
             $f.find('.bp-dep-new').val(cur.depOld);
