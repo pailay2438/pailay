@@ -89,7 +89,9 @@
     function act(a, body, ok) {
         return call('posact', { act: a, body: JSON.stringify(body) }).then(function (r) {
             if (r.status !== 'success') { Swal.fire({ icon: 'error', title: 'ไม่สำเร็จ', text: r.message || '' }); return; }
-            if (ok) Swal.fire({ icon: 'success', title: ok, timer: 1200, showConfirmButton: false });
+            var inc = r.data && r.data.income;
+            if (inc && inc.warn) Swal.fire({ icon: 'warning', title: 'รับเงินแล้ว แต่ลงรายรับไม่ครบ', text: inc.warn });
+            else if (ok) Swal.fire({ icon: 'success', title: ok, text: inc && inc.rows ? 'ลงรายรับ “ค่าอาหาร” ' + inc.rows + ' รายการแล้ว' : '', timer: 1600, showConfirmButton: false });
             load();
         }).catch(function () { Swal.fire({ icon: 'error', title: 'ติดต่อหลังบ้านไม่ได้' }); });
     }
@@ -143,9 +145,11 @@
                 Swal.fire({ title: 'รับเงินสดครบบิล?', icon: 'question', showCancelButton: true, confirmButtonText: 'รับเงินแล้ว', cancelButtonText: 'ปิด' }).then(function (r) { if (r.isConfirmed) act('cash', { paymentIds: ids }, 'บันทึกรับเงินแล้ว'); });
             } else if (d === 'slip') {
                 var ids2 = String($c.data('ids')).split(',').filter(Boolean);
-                Swal.fire({ title: 'แนบสลิปโอน', input: 'file', inputAttributes: { accept: 'image/*' }, showCancelButton: true, confirmButtonText: 'ส่งสลิป', cancelButtonText: 'ปิด' }).then(function (r) {
+                var banks = []; try { banks = (window.eval('bank') || []).map(function (x) { return x[0]; }).filter(Boolean); } catch (e) {}
+                Swal.fire({ title: 'แนบสลิปโอน', html: '<select id="po-acc" class="swal2-select" style="width:90%"><option value="">เลือกบัญชีที่รับเงิน *</option>' + banks.map(function (b) { return '<option>' + esc(b) + '</option>'; }).join('') + '</select><input type="file" id="po-slip" accept="image/*" class="swal2-file" style="width:90%">', showCancelButton: true, confirmButtonText: 'ส่งสลิป', cancelButtonText: 'ปิด',
+                    preConfirm: function () { var f = document.getElementById('po-slip').files[0], a = document.getElementById('po-acc').value; if (!a) { Swal.showValidationMessage('เลือกบัญชีที่รับเงิน'); return false; } if (!f) { Swal.showValidationMessage('เลือกรูปสลิป'); return false; } return { f: f, a: a }; } }).then(function (r) {
                     if (!r.isConfirmed || !r.value) return;
-                    fileToData(r.value).then(function (data) { act('slip', { paymentIds: ids2, slip: data }, 'บันทึกสลิปแล้ว'); });
+                    fileToData(r.value.f).then(function (data) { act('slip', { paymentIds: ids2, slip: data, account: r.value.a }, 'บันทึกสลิปแล้ว'); });
                 });
             }
         });
