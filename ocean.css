@@ -271,3 +271,38 @@ body[data-bs-theme="dark"] .plc-acts .btn.danger { background: #3a1517 !importan
 .plc-acts .btn:disabled { opacity: .55; }
 .plc-x .o-pays img { border-radius: 8px; }
 .plc-chip:not(.t):not(.w):not(.ok):not(.d) { background: var(--pl-bg); color: var(--pl-muted); border: 1px solid var(--pl-line); }
+
+/* ===== POS ออเดอร์อาหาร (pos.js) ===== */
+main.posorders .po-top{display:flex;align-items:baseline;justify-content:space-between;margin:14px 0 8px}
+main.posorders .po-top h5{margin:0;font-weight:700}
+main.posorders .po-upd{font-size:12px;color:#6b7c8a}
+main.posorders .po-tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px;margin-bottom:8px}
+main.posorders .po-tabs button{border:1px solid #cfe0ee;background:#fff;color:#245;border-radius:999px;padding:7px 14px;font-size:14px;white-space:nowrap}
+main.posorders .po-tabs button.on{background:#0d6efd;border-color:#0d6efd;color:#fff}
+main.posorders .po-tabs i{font-style:normal;background:#dc3545;color:#fff;border-radius:999px;padding:0 7px;font-size:12px;margin-left:3px}
+main.posorders .po-list{display:grid;grid-template-columns:1fr;gap:12px;padding-bottom:90px}
+@media(min-width:992px){main.posorders .po-list{grid-template-columns:repeat(3,1fr)}}
+main.posorders .po-card{background:#fff;border:1px solid #dbe8f3;border-radius:18px;padding:14px;box-shadow:0 2px 10px rgba(13,110,253,.06)}
+main.posorders .po-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+main.posorders .po-head small{margin-left:auto;color:#6b7c8a}
+main.posorders .po-tag{border-radius:999px;padding:2px 10px;font-size:12px;font-weight:600;color:#123}
+main.posorders .po-allergy{background:#dc3545;color:#fff;border-radius:10px;padding:6px 10px;margin:8px 0;font-weight:600;font-size:14px}
+main.posorders .po-items{list-style:none;margin:10px 0;padding:0}
+main.posorders .po-items li{display:flex;justify-content:space-between;gap:10px;padding:5px 0;border-bottom:1px dashed #e3edf5}
+main.posorders .po-items em{display:block;font-size:12px;color:#6b7c8a}
+main.posorders .po-ask{background:#fff3cd;color:#8a6d00;border-radius:8px;padding:1px 7px;font-size:12px}
+main.posorders .po-ok{background:#d1f1dd;color:#146c43;border-radius:8px;padding:1px 7px;font-size:12px}
+main.posorders .po-foot{margin:6px 0 10px}
+main.posorders .po-acts{display:flex;gap:8px;flex-wrap:wrap}
+main.posorders .po-btn{border:1px solid #cfe0ee;background:#fff;border-radius:12px;padding:9px 14px;font-size:15px;min-height:44px}
+main.posorders .po-btn.po-pri{background:#0d6efd;border-color:#0d6efd;color:#fff;flex:1}
+main.posorders .po-btn.po-bad{color:#dc3545;border-color:#f1b9bf}
+main.posorders .po-btn.po-ghost{margin-left:auto}
+main.posorders .po-bigtotal{font-size:30px;font-weight:700;margin:8px 0 12px}
+main.posorders .po-empty{grid-column:1/-1;text-align:center;color:#6b7c8a;padding:40px 0}
+main.posorders .po-err{color:#dc3545}
+main.posorders .po-note{color:#6b7c8a;font-size:14px}
+.po-edwrap .po-ed{display:grid;grid-template-columns:1fr 70px 100px;gap:6px;align-items:center;text-align:left;margin-bottom:6px}
+.po-edwrap input{width:100%;padding:6px;border:1px solid #cfe0ee;border-radius:8px}
+main.posorders .po-top h5{color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.25)}
+main.posorders .po-upd{color:rgba(255,255,255,.85)}
